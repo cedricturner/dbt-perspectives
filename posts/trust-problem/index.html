@@ -101,15 +101,15 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Adoption &amp; Culture</div>
   <h1>Data teams don't have<br>a quality problem.<br>They have a trust problem.</h1>
-  <p class="lede">Tests tell you when something broke. They don't make the pipeline legible. Most teams rebuild the same model five times — not because the first one was broken, but because they couldn't tell whether it was right.</p>
+  <p class="lede">Tests tell you when something broke. They don't tell you whether the pipeline is doing what you think. Those are different problems.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">The standard response to "I don't trust the data" is: add more tests. Write assertions. Check row counts. Test uniqueness. Expand coverage. It's an engineering instinct — if something can break, add a guard.</p>
-  <p class="prose">It's not a wrong instinct. But it's aimed at a different problem than the one most teams actually have.</p>
-  <p class="prose">Most data teams don't distrust their pipelines because they produce wrong data. They distrust them because they can't <em>tell</em> whether the data is right. Those are different problems — and they have different solutions.</p>
+  <p class="prose">The standard response to "I don't trust the data" is: add more tests. Write assertions. Check row counts. Test uniqueness. Expand coverage. It's a reasonable instinct.</p>
+  <p class="prose">It's aimed at the wrong problem.</p>
+  <p class="prose">Most data teams don't distrust their pipelines because they produce wrong data. They distrust them because they can't <em>tell</em> whether the data is right. That's not a quality problem. It's a visibility problem.</p>
 </div>
 
 <div class="sep"></div>
@@ -117,8 +117,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2: TENSION -->
 <div class="section">
   <p class="section-label">The tension</p>
-  <p class="prose">Here's the canonical symptom: two teams are presenting to the same executive. Revenue for Q3. Different numbers. Both teams built their models carefully. Both are passing their tests.</p>
-  <p class="prose">The meeting turns into a definition negotiation. Whose number is right? What counts as revenue — gross, net, recognized? Are refunds subtracted? How does it handle the month-end edge case? Nobody knows, because the pipelines are opaque — you'd have to read the scripts to find out.</p>
+  <p class="prose">Here's the thing that keeps happening. Two teams present to the same executive. Q3 revenue. Different numbers. Both built their models carefully. Both are passing their tests.</p>
+  <p class="prose">The meeting turns into a definition negotiation. What counts as revenue — gross, net, recognized? Are refunds subtracted? How does it handle the month-end edge case? Nobody actually knows, because the pipelines are opaque. You'd have to read the code to find out — and nobody has time for that in the meeting.</p>
 
   <div style="margin-top:28px;margin-bottom:8px">
     <table class="rev-table">
@@ -163,7 +163,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <p class="caption">Five teams. Five numbers. All passing tests. Nobody wrong — they just answered different questions.</p>
 
   <div class="pull" style="margin-top:28px">
-    Tests confirmed each model was internally consistent. They didn't — and couldn't — tell anyone which model was <strong>canonical</strong>. That's a visibility problem, not a quality problem.
+    Tests confirmed each model was internally consistent. They couldn't tell anyone which model was <strong>canonical</strong>. That's not a quality failure. That's a visibility failure.
   </div>
 </div>
 
@@ -172,7 +172,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 3: WHAT CHANGES -->
 <div class="section">
   <p class="section-label">What actually changes</p>
-  <p class="prose">Tests and visibility are different capabilities. Tests verify correctness: when a constraint is violated, you find out. Visibility makes the pipeline legible: anyone can inspect what it does, trace intermediate steps, and understand the definition without reading the source code.</p>
+  <p class="prose">Tests and visibility are different things. Tests verify correctness — when a constraint is violated, you find out. Visibility makes the pipeline legible — anyone can inspect what it does, trace intermediate steps, understand the definition without having to ask someone who built it.</p>
 
   <div class="compare-wrap" style="margin-top:24px;margin-bottom:28px">
     <div class="compare-block">
@@ -192,7 +192,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </div>
   </div>
 
-  <p class="prose">The shift dbt enables isn't primarily the test framework. It's that every intermediate step is a real, persistent, queryable table. When another team wants to understand your revenue model, they don't schedule a meeting — they run a SELECT.</p>
+  <p class="prose">The thing dbt does that tests don't: every intermediate step becomes a real, persistent, queryable table. When another team wants to understand your revenue model, they don't schedule a meeting. They run a SELECT.</p>
 </div>
 
 <div class="sep"></div>
@@ -200,7 +200,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 4: SINGLE SOURCE -->
 <div class="section">
   <p class="section-label">What emerges</p>
-  <p class="prose">When the canonical definition lives in one dbt model — and every team references it with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> — there's no longer a "which revenue?" meeting. There's one answer. It might still be wrong in some people's eyes, but at least the argument is about the definition, not about whose calculation to trust.</p>
+  <p class="prose">When the canonical definition lives in one dbt model — and every team references it with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> — there's no more "which revenue?" meeting. There's one answer. It might still be wrong in someone's view, but at least the disagreement is about the definition — not about whose calculation to trust.</p>
 
   <div style="margin-top:28px">
     <div class="single-source">
@@ -228,10 +228,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       </div>
     </div>
   </div>
-  <p class="caption">Five teams. One number. The definition debate becomes a PR review — not a recurring meeting.</p>
+  <p class="caption">Five teams. One number. The definition debate becomes a PR comment — not a recurring meeting.</p>
 
   <div class="pull" style="margin-top:28px">
-    The "five versions of revenue" problem isn't a definition problem. It's a visibility problem. When there's one canonical table that everyone can query and inspect, the question shifts from "whose number?" to "is this definition right?" — which is a much more productive conversation.
+    The "five versions of revenue" problem isn't a definition problem. It's a visibility problem. When there's one canonical table everyone can query and inspect, the question shifts from "whose number?" to "is this definition right?" — which is a much more useful conversation.
   </div>
 </div>
 
@@ -240,9 +240,9 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 5: CONSEQUENCE -->
 <div class="section">
   <p class="section-label">The consequence</p>
-  <p class="prose">The downstream effect of opaque pipelines isn't usually a data quality failure. It's a duplication failure. Teams stop trusting shared infrastructure and start maintaining their own private copies.</p>
-  <p class="prose">Over time, the organization ends up with five "revenue" definitions, three "customer" definitions, and a permanent low-grade argument about whose numbers are right. Every new analyst who joins inherits this confusion. Every new dashboard adds to it.</p>
-  <p class="prose">The fix isn't more tests. Tests don't prevent duplication — they just make each duplicate slightly more reliable. Visibility prevents duplication, because when people can inspect what a model does, they build on top of it instead of alongside it.</p>
+  <p class="prose">The downstream effect of opaque pipelines isn't usually a data quality failure. It's a duplication failure. Teams stop trusting shared infrastructure and start maintaining their own copies.</p>
+  <p class="prose">Over time you end up with five "revenue" definitions, three "customer" definitions, and a permanent low-grade argument about whose numbers are right. Every new analyst who joins inherits this. Every new dashboard adds to it.</p>
+  <p class="prose">More tests don't fix it. Tests make each duplicate slightly more reliable. They don't stop the duplication. Visibility stops the duplication — when people can see inside a model, they build on it instead of rebuilding it.</p>
 </div>
 
 <div class="sep"></div>
@@ -250,17 +250,17 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 6: WHEN IT BREAKS -->
 <div class="section">
   <p class="section-label">When it breaks</p>
-  <p class="prose">Trust failures look different from quality failures. Click each scenario.</p>
+  <p class="prose">Trust failures look different from quality failures. Here's what they actually look like.</p>
 
   <div style="margin-top:24px">
     <div class="scenario">
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A number looks off in a dashboard</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>Alert fires. The on-call analyst checks the dashboard and can't tell where the number comes from. They Slack the data engineer who built it. Three hours later: "looks like a data quality issue." Nobody can see inside the model to confirm.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Query <code>fct_revenue</code>. Does the row count look right? Query <code>stg_orders</code> for the same date range. The discrepancy is visible without a human expert to mediate. The model is the documentation.</p></div>
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The on-call analyst checks the dashboard and can't tell where the number comes from. They Slack the person who built it. Three hours later: "looks like a data quality issue." Nobody can see inside the model to confirm either way.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Query <code>fct_revenue</code>. Does the row count look right? Query <code>stg_orders</code> for the same date range. The discrepancy is right there. No expert needed. The model explains itself.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> in an opaque pipeline, debugging requires the person who built it. In a visible pipeline, anyone who can write SQL can investigate.</div>
+        <div class="scenario-note"><strong>The difference:</strong> in an opaque pipeline, debugging requires the person who built it. In a visible one, anyone who can write SQL can investigate.</div>
       </div>
     </div>
 
@@ -268,8 +268,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">New analyst joins and needs to understand the data</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The onboarding doc says "use the revenue table." The analyst queries it and gets a number that doesn't match last week's exec review. They schedule a meeting with three people to understand why. This happens four times in their first month.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The analyst reads <code>fct_revenue.sql</code>. They can see exactly what's included and excluded. They can trace upstream to <code>stg_orders</code> and see where the data comes from. Questions answered without a meeting.</p></div>
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The onboarding doc says "use the revenue table." The analyst queries it and gets a number that doesn't match last week's exec review. They schedule a meeting with three people to figure out why. This happens four times in the first month.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The analyst reads <code>fct_revenue.sql</code>. They can see what's included, what's excluded. They trace upstream to <code>stg_orders</code> and see where the data comes from. Questions answered. No meeting needed.</p></div>
         </div>
         <div class="scenario-note">Every meeting to "align on definitions" is a visibility failure that should have been a SQL file.</div>
       </div>
@@ -279,10 +279,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Two teams have different numbers in the same exec review</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The meeting stalls. Someone says "let's take this offline." An action item is created to "align on revenue definition." This action item recurs quarterly. Nobody has time to fix it. The distrust compounds.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Both teams reference <code>ref('fct_revenue')</code>. They get the same number. If there's disagreement about whether that number is right, it's a discussion about the model definition — which has a PR, a history, and a clear owner.</p></div>
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The meeting stalls. Someone says "let's take this offline." An action item gets created to "align on the revenue definition." This same action item recurs quarterly. Nobody fixes it. The distrust compounds.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Both teams reference <code>ref('fct_revenue')</code>. Same number. If there's disagreement about whether it's right, the conversation is about the model definition — which has a PR, a history, a clear owner.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> one shared model makes disagreements concrete ("the model excludes refunds — should it?") instead of diffuse ("we have different numbers — why?").</div>
+        <div class="scenario-note"><strong>The difference:</strong> a shared model makes disagreements concrete ("the model excludes refunds — should it?") instead of diffuse ("we have different numbers — why?").</div>
       </div>
     </div>
 
@@ -290,10 +290,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A staging model gets updated</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The analyst updates their script. Two weeks later, three dashboards start showing different numbers. Nobody knows what changed or which reports are affected. A post-mortem is scheduled to "trace the lineage manually."</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>dbt's lineage graph shows exactly which downstream models reference <code>stg_orders</code>. Run <code>dbt run -s stg_orders+</code> to re-execute everything that depends on it. Impact is visible before and after the change.</p></div>
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The analyst updates their script. Two weeks later, three dashboards start showing different numbers. Nobody knows what changed or which reports are affected. Someone schedules a post-mortem to "trace the lineage manually."</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The lineage graph shows every downstream model that references <code>stg_orders</code>. Run <code>dbt run -s stg_orders+</code> and everything that depends on it re-executes. Impact is visible before the change ships, not after.</p></div>
         </div>
-        <div class="scenario-note">Lineage is a byproduct of visibility. You don't build it — it emerges from <code>ref()</code> calls that already had to exist.</div>
+        <div class="scenario-note">Lineage isn't something you build separately. It emerges from the <code>ref()</code> calls that already had to be there.</div>
       </div>
     </div>
   </div>
@@ -305,13 +305,13 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="section">
   <p class="section-label">The point</p>
   <p class="conclusion">Data teams don't have a quality problem. They have a trust problem.</p>
-  <p class="conclusion">And trust isn't built by adding more tests to the same opaque pipeline. Trust is built when people can look inside the pipeline — when the intermediate steps are real tables they can query, when the definition lives in one file they can read, when a new analyst can understand the model without booking a meeting.</p>
-  <p class="prose">Tests are necessary. They're not sufficient. A pipeline can pass all its tests and still be trusted by nobody — because trust requires legibility, and legibility requires visibility.</p>
-  <p class="prose" style="margin-top:16px">The question to ask about any data platform: <em>can a person I've never met understand what this model does by reading it?</em> If yes, trust can transfer. If no, it's locked in the head of whoever built it.</p>
+  <p class="conclusion">Trust isn't built by adding more tests to the same opaque pipeline. It's built when people can actually look inside — when intermediate steps are real tables they can query, when the definition lives in one file anyone can read, when a new analyst can understand the model without booking a meeting to ask the person who built it.</p>
+  <p class="prose">Tests are necessary. They're just not sufficient. A pipeline can pass every test and still be trusted by nobody — because trust requires legibility, and legibility requires visibility.</p>
+  <p class="prose" style="margin-top:16px">Here's the question worth asking about any data platform: can someone who never worked on this model understand what it does by reading it? If yes, trust can transfer. If no, it stays locked in the head of whoever built it.</p>
   <div class="pull" style="margin-top:28px">
     Most data teams don't rebuild because the platform is unreliable. They rebuild because they can't see inside it.<br>
     "I trust it" usually means "I built it." That's not a quality problem — it's a visibility problem.<br>
-    <em>Making intermediate state persistent and visible doesn't improve data quality. It transfers trust.</em>
+    <em>Persistent intermediate tables don't improve data quality. They transfer trust.</em>
   </div>
 </div>
 

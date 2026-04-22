@@ -105,15 +105,15 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Architecture</div>
   <h1>Python or SQL<br>is the wrong question</h1>
-  <p class="lede">The language doesn't matter. Where the computation runs does. When you transform data in Python, you're solving a different architectural problem than language preference — and creating a different set of constraints.</p>
+  <p class="lede">Python vs SQL is the wrong debate. The real question is whether computation runs on your machine or in the warehouse. That's what actually changes when things scale.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">The debate resurfaces regularly. Python is more expressive — you can use libraries, write complex logic, do things SQL simply can't. SQL is more readable, closer to the data, easier to audit. Teams pick sides, tooling follows, and the real question gets missed.</p>
-  <p class="prose">The real question isn't about syntax or expressiveness. It's architectural: <em>where does the computation actually run?</em></p>
-  <p class="prose">Language is a preference. Location is a constraint. And most teams optimizing for language preference end up surprised by the constraints they've inherited.</p>
+  <p class="prose">The debate resurfaces every few years. Python is more expressive — libraries, complex logic, things SQL genuinely can't do. SQL is more readable, closer to the data, easier to audit. Teams pick sides, tooling follows, and the real question gets missed.</p>
+  <p class="prose">The real question isn't about syntax. It's about where the computation runs.</p>
+  <p class="prose">Language is a preference. Location is a constraint. Most teams optimizing for language preference end up surprised by the constraints that come with it.</p>
 </div>
 
 <div class="sep"></div>
@@ -121,9 +121,9 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2: TENSION -->
 <div class="section">
   <p class="section-label">The tension</p>
-  <p class="prose">When you write a Python transformation, the computation runs on a machine — yours, or a container. The data travels from the warehouse to that machine, gets processed in memory, and the result travels back. Your machine's resources set the ceiling.</p>
-  <p class="prose">When you write a SQL transformation in dbt, the computation runs inside the warehouse. The data doesn't move. The warehouse's compute and memory handle it. You can resize those resources without changing the code.</p>
-  <p class="prose" style="margin-bottom:28px">The difference isn't style. It's where the work happens — and what that implies about scale, failure, and observability.</p>
+  <p class="prose">When you write a Python transformation, computation runs on a machine — yours, or a container. The data travels from the warehouse to that machine, gets processed in memory, and the result travels back. Your machine's resources set the ceiling.</p>
+  <p class="prose">When you write a SQL transformation in dbt, computation runs inside the warehouse. The data doesn't move. The warehouse handles it. You resize the warehouse when you need more compute. The code doesn't change.</p>
+  <p class="prose" style="margin-bottom:28px">That's not a style difference. It's an architectural one. And it changes a lot about what happens when things scale — or break.</p>
 
   <div class="arch-wrap">
     <div class="arch-block bad">
@@ -203,7 +203,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <p class="caption">Same transformation. Different architecture. One pulls data to a machine; the other keeps it in the warehouse.</p>
 
   <div class="pull" style="margin-top:28px">
-    The language you write in is secondary. The fundamental question is: <strong>where does the computation happen?</strong> On your machine, where RAM is the ceiling? Or in the warehouse, where scale is a configuration?
+    The language you write in is secondary. The question that matters is: <strong>where does the computation happen?</strong> On your machine, where RAM is the ceiling? Or in the warehouse, where scale is just a configuration?
   </div>
 </div>
 
@@ -212,7 +212,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 3: WHAT CHANGES -->
 <div class="section">
   <p class="section-label">What actually changes</p>
-  <p class="prose">The architectural choice determines a cluster of downstream properties — not just scale, but also persistence, parallelism, observability, and cost model. These aren't independent variables. They follow from the location decision.</p>
+  <p class="prose">The location decision doesn't just affect scale. It determines a whole set of downstream properties — persistence, parallelism, observability, cost model. They're not independent. They all follow from where the computation runs.</p>
 
   <div class="tradeoff-grid" style="margin-top:24px;margin-bottom:16px">
     <div class="tradeoff-block" style="border-color:rgba(248,81,73,.2)">
@@ -241,8 +241,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 4: WHAT EMERGES -->
 <div class="section">
   <p class="section-label">What emerges</p>
-  <p class="prose">Once you frame the decision as "where should this computation run?" instead of "which language should I use?" — the answer is usually obvious. Most data transformation is set operations on structured tables. Warehouses are purpose-built for that. Run it there.</p>
-  <p class="prose">The places where Python genuinely makes sense are narrower than people assume — and narrower than the Python ecosystem's popularity suggests.</p>
+  <p class="prose">When you ask "where should this computation run?" instead of "which language should I use?" — the answer is usually obvious. Most data transformation is set operations on structured tables. Warehouses are built for that. Run it there.</p>
+  <p class="prose">The places where Python genuinely makes sense are narrower than people assume — and a lot narrower than the Python ecosystem's popularity makes it seem.</p>
 
   <div style="margin-top:28px">
     <table class="decision-table">
@@ -301,17 +301,17 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 5: SCENARIOS -->
 <div class="section">
   <p class="section-label">When it matters</p>
-  <p class="prose">The location decision is abstract until scale forces it. Click each scenario to see where the tradeoff becomes concrete.</p>
+  <p class="prose">The location decision is abstract until scale forces it. Here's where the tradeoff becomes concrete.</p>
 
   <div style="margin-top:24px">
     <div class="scenario">
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Data volume grows 10x over a year</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">Python pipeline</div><p>The script starts hitting memory limits. The fix is chunking, Dask, or rewriting to push the logic into the warehouse anyway — which means rewriting the transformation in SQL. You did the work twice.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Same SQL. Resize the warehouse if needed. The transformation is already in the warehouse — there's no architectural ceiling to hit. The cost model changes; the code doesn't.</p></div>
+          <div class="dc"><div class="ch">Python pipeline</div><p>The script starts hitting memory limits. The fix is chunking, Dask, or pushing the logic into the warehouse — which means rewriting the transformation in SQL anyway. You did the work twice.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Same SQL. Resize the warehouse if needed. The transformation is already in the warehouse — no architectural ceiling to hit. The cost model changes. The code doesn't.</p></div>
         </div>
-        <div class="scenario-note"><strong>The hidden cost:</strong> Python pipelines often get migrated to SQL when data grows. If you anticipate that, starting in SQL avoids a rewrite.</div>
+        <div class="scenario-note"><strong>The hidden cost:</strong> Python pipelines often end up migrated to SQL when data grows. If you can see that coming, starting in SQL avoids the rewrite.</div>
       </div>
     </div>
 
@@ -319,10 +319,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">You need to run ML on top of the transformed data</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">all-Python approach</div><p>The feature engineering and model training are mixed in the same script. It's hard to test the features independently. When the model is retrained, the feature logic re-runs too — even if nothing changed.</p></div>
-          <div class="dc"><div class="ch">dbt + Python</div><p>Feature engineering in dbt (warehouse). Training in Python using <code>ref('fct_features')</code> as input. The feature table is a persistent, testable warehouse table. Python only handles what SQL can't.</p></div>
+          <div class="dc"><div class="ch">all-Python approach</div><p>Feature engineering and model training are mixed in the same script. Hard to test features independently. When the model retrains, the feature logic reruns too — even if nothing changed upstream.</p></div>
+          <div class="dc"><div class="ch">dbt + Python</div><p>Feature engineering in dbt (warehouse). Training in Python using <code>ref('fct_features')</code> as input. The feature table is a persistent, testable warehouse table. Python only touches what SQL actually can't do.</p></div>
         </div>
-        <div class="scenario-note">dbt and Python aren't alternatives — they're layers. dbt produces the features; Python consumes them. Both do what they're good at.</div>
+        <div class="scenario-note">dbt and Python aren't alternatives — they're layers. dbt produces the features; Python consumes them. Each does what it's actually good at.</div>
       </div>
     </div>
 
@@ -330,10 +330,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A new person joins who doesn't know Python</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">Python pipeline</div><p>They need to understand the Pandas idioms, the DataFrame merges, the order of operations. They can't query intermediate results without re-running the script. The logic is implicit in the code structure.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Each model is a SQL SELECT. Any analyst with SQL skills can read it, query the intermediate tables, and understand what it does without running anything. The pipeline is self-documenting by structure.</p></div>
+          <div class="dc"><div class="ch">Python pipeline</div><p>They need to understand the Pandas idioms, the DataFrame merges, the order of operations. They can't query intermediate results without re-running the script. The logic is buried in the code structure.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Each model is a SQL SELECT. Any analyst with SQL skills can read it, query the intermediate tables, understand what it does without running anything. The pipeline explains itself.</p></div>
         </div>
-        <div class="scenario-note">SQL is more widely readable than Python. For data pipelines that more than one person needs to understand, that matters.</div>
+        <div class="scenario-note">SQL is more widely readable than Python. For a pipeline that more than one person needs to understand, that actually matters.</div>
       </div>
     </div>
 
@@ -341,10 +341,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A pipeline fails at 2am</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">Python pipeline</div><p>Process crashed. No intermediate state survived. You need to reproduce the failure, which means re-running the whole script — same data transfers, same compute time — before you can diagnose. You're debugging from a blank slate.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>The completed models are still in the warehouse. The warehouse has a query log showing exactly what ran. You re-run only the failed model. Debugging starts from evidence, not from scratch.</p></div>
+          <div class="dc"><div class="ch">Python pipeline</div><p>Process crashed. No intermediate state survived. You re-run the whole script — same data transfers, same compute time — before you can even start diagnosing. You're debugging from a blank slate.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>The completed models are still in the warehouse. The warehouse has a query log showing exactly what ran. You re-run only the failed model. Debugging starts from evidence — not from zero.</p></div>
         </div>
-        <div class="scenario-note">At 2am, the question isn't "which language is better." It's "what can I inspect right now, without re-running anything?"</div>
+        <div class="scenario-note">At 2am, the question isn't "which language is better." It's "what can I actually look at right now, without re-running anything?"</div>
       </div>
     </div>
   </div>
@@ -356,13 +356,13 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="section">
   <p class="section-label">The point</p>
   <p class="conclusion">Python or SQL is the wrong question.</p>
-  <p class="conclusion">The question is: where should this computation run? On a machine, with your machine's memory as the ceiling, intermediate state that vanishes on failure, and data that has to travel back and forth? Or in the warehouse, where the data already lives, at the scale the warehouse provides, with intermediate results that survive as queryable tables?</p>
-  <p class="prose">Python and SQL aren't alternatives — they're tools for different layers. Python for ingestion, ML, and operations that require external compute. SQL (in dbt) for transformation that can be expressed as set operations on data that's already in the warehouse.</p>
-  <p class="prose" style="margin-top:16px">The teams that argue most intensely about Python vs SQL are usually the ones who haven't yet hit the scale at which the location decision becomes obvious. Once you do, the language preference feels secondary.</p>
+  <p class="conclusion">The question is: where should this computation run? On a machine — with your machine's memory as the ceiling, intermediate state that disappears on failure, data that has to travel back and forth? Or in the warehouse, where the data already lives, at the scale the warehouse provides, with intermediate results that survive as queryable tables?</p>
+  <p class="prose">Python and SQL aren't alternatives. They're tools for different layers. Python for ingestion, ML, and things that genuinely require external compute. SQL (in dbt) for transformation that can be expressed as set operations on data that's already in the warehouse.</p>
+  <p class="prose" style="margin-top:16px">The teams that argue hardest about Python vs SQL are usually the ones who haven't hit the scale at which the location decision becomes obvious. Once you do, the language preference is the last thing you're thinking about.</p>
   <div class="pull" style="margin-top:28px">
     The language debate is a proxy for a location debate.<br>
     Once you see it that way, the answer is usually obvious: run computation where the data lives, use Python for what SQL genuinely can't do.<br>
-    <em>That's not a Python vs SQL opinion. It's a principle about where work should happen.</em>
+    <em>That's not a language preference. It's just where the work should happen.</em>
   </div>
 </div>
 

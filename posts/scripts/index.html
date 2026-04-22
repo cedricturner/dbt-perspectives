@@ -109,15 +109,15 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Data Engineering</div>
   <h1>What moving to dbt<br>actually changes</h1>
-  <p class="lede">It's not the SQL syntax, the version control, or the modular files. It's that computation moves from your machine to the warehouse — and that changes everything about how you debug, scale, and build on top of it.</p>
+  <p class="lede">It's not really about the SQL. And it's not about version control or modular files. What changes is where the computation actually runs. That one thing — your machine vs the warehouse — changes pretty much everything else.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">The comparison gets framed as a language debate. You have a Python pipeline — Pandas, SQLAlchemy, maybe some Spark — and someone says dbt is just SQL. So the evaluation becomes: what does your team prefer, and what does your data require?</p>
-  <p class="prose">Teams with sophisticated Python pipelines often dismiss dbt early. "We already have modular functions. We already have unit tests. Why rewrite everything in SQL?"</p>
-  <p class="prose">It's a reasonable question. But it's aimed at the wrong variable.</p>
+  <p class="prose">The comparison gets framed as a language debate. You have a Python pipeline, someone says dbt is just SQL, and suddenly the evaluation becomes: what does your team prefer? What does your data require?</p>
+  <p class="prose">Teams with solid Python pipelines often dismiss dbt early. "We already have modular functions. We already have unit tests. Why rewrite everything?"</p>
+  <p class="prose">It's a reasonable question. It's aimed at the wrong thing.</p>
 </div>
 
 <div class="sep"></div>
@@ -125,8 +125,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2: TENSION -->
 <div class="section">
   <p class="section-label">The tension</p>
-  <p class="prose">The language isn't what determines whether this pipeline works at scale. The location does.</p>
-  <p class="prose">A Pandas pipeline pulls data <em>to your machine</em>, transforms it in memory, and writes the result back. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql()</code> is a data transfer. Every DataFrame is in-memory state that exists only as long as the process runs. When it fails, everything in memory is gone.</p>
+  <p class="prose">The language isn't what matters here. The location is.</p>
+  <p class="prose">A Pandas pipeline pulls data to your machine, transforms it in memory, and writes the result back. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql()</code> is a data transfer. Every DataFrame exists only while the process runs. When it fails, everything is gone.</p>
 
   <div class="code-wrap" style="border-color:#f85149;margin-top:28px">
     <div class="code-head" style="background:rgba(248,81,73,.05)">
@@ -174,10 +174,10 @@ orders_w_pmts    = clean_orders.merge(pmt_by_order, on=<span style="color:#a5d6f
               schema=<span style="color:#a5d6ff">"analytics"</span>, if_exists=<span style="color:#a5d6ff">"replace"</span>, index=<span style="color:#ff7b72">False</span>)</pre>
     </div>
   </div>
-  <p class="caption">One file. Data moves to your machine and back. Everything in memory disappears on crash or scale limits.</p>
+  <p class="caption">One file. Data travels to your machine, gets transformed in memory, travels back. Nothing survives if the process dies.</p>
 
   <div class="pull" style="margin-top:28px">
-    This isn't bad code. It's reasonable Python that does exactly what it was designed to do. The problem is the architecture: computation happens on your machine, which means the data has to travel there — and your machine's memory is the ceiling.
+    This isn't bad code. It does exactly what it was built to do. The problem is the architecture. Computation happens on your machine, which means the data has to travel there — and your machine's memory is the ceiling.
   </div>
 </div>
 
@@ -186,9 +186,9 @@ orders_w_pmts    = clean_orders.merge(pmt_by_order, on=<span style="color:#a5d6f
 <!-- SECTION 3: WHAT CHANGES -->
 <div class="section">
   <p class="section-label">What actually changes</p>
-  <p class="prose">dbt doesn't replace Python with SQL. It moves the computation from your machine into the warehouse — where the data already lives. The transformation logic is nearly identical. What changes is where it runs.</p>
-  <p class="prose">Instead of <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql("SELECT * FROM raw.customers")</code>, you write <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source('raw','customers')</code> — and the warehouse handles it. Instead of DataFrames in memory, each step is a real, persistent table. Instead of a Python script that vanishes when it runs, a set of dbt models that leave evidence behind.</p>
-  <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see the transformation — and what specifically moves.</p>
+  <p class="prose">dbt doesn't swap Python for SQL. It moves the computation from your machine into the warehouse — where the data already lives. The logic is nearly identical. What changes is where it runs.</p>
+  <p class="prose">Instead of <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql("SELECT * FROM raw.customers")</code>, you write <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source('raw','customers')</code> and the warehouse handles it. Instead of DataFrames in memory, each step becomes a real table. Instead of a script that disappears when it runs, models that leave evidence behind.</p>
+  <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see what actually changes.</p>
 
   <div class="expand-block" id="b1" onclick="toggle('b1','r1')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">pd.read_sql("SELECT * FROM raw.customers")</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Data transfer</span></div>
@@ -208,7 +208,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
     <span style="color:#79c0ff">COALESCE</span>(first_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
     <span style="color:#79c0ff">COALESCE</span>(last_name,  <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'customers'</span>) }}</pre>
-        <div class="what-changed"><strong>What changed:</strong> The transformation logic is identical. What moved is where it runs. <code>pd.read_sql()</code> transfers data to your machine; <code>source()</code> tells the warehouse to read locally. The result is a real, persistent warehouse table — not a Python object that vanishes when the process exits.</div>
+        <div class="what-changed"><strong>What changed:</strong> The logic is identical. What changed is where it runs. <code>pd.read_sql()</code> pulls data to your machine. <code>source()</code> tells the warehouse to read it directly — no transfer. The result is a real warehouse table that sticks around after the run finishes, whether it succeeded or not.</div>
       </div>
     </div>
   </div>
@@ -224,7 +224,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
         <pre><span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'orders'</span>) }}
 <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span></pre>
-        <div class="what-changed"><strong>What changed:</strong> Now a standalone warehouse table that exists after the run. When another team needs clean orders, they write <code>ref('stg_orders')</code> — not copy-paste this filter logic into their own script. "What is a valid order" lives in one place.</div>
+        <div class="what-changed"><strong>What changed:</strong> Now it's its own warehouse table. Another team needs clean orders? They write <code>ref('stg_orders')</code>. They don't copy-paste this filter logic into their own thing. "What counts as a valid order" lives in one place.</div>
       </div>
     </div>
   </div>
@@ -241,7 +241,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
         <pre><span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'payments'</span>) }}
 <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span></pre>
-        <div class="what-changed"><strong>What changed:</strong> <code>stg_customers</code>, <code>stg_orders</code>, and <code>stg_payments</code> all reference only <code>source()</code> — no <code>ref()</code> between them. dbt sees they're independent and runs all three simultaneously. The Python script had no way to do that.</div>
+        <div class="what-changed"><strong>What changed:</strong> <code>stg_customers</code>, <code>stg_orders</code>, and <code>stg_payments</code> all reference only <code>source()</code>. None of them depend on each other. dbt sees that and runs all three at the same time. The Python script ran them one after another, because that's all it could do.</div>
       </div>
     </div>
   </div>
@@ -259,7 +259,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_payments'</span>) }} p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
 <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount</pre>
-        <div class="what-changed"><strong>What changed:</strong> The merge becomes a SQL JOIN that runs in the warehouse. <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code> are dependency declarations — dbt knows to run both staging models first. You didn't write orchestration logic. The <code>ref()</code> calls <em>are</em> the orchestration.</div>
+        <div class="what-changed"><strong>What changed:</strong> The merge becomes a SQL JOIN that runs inside the warehouse. <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code> tell dbt what this model needs before it can run. You don't write any orchestration logic. The <code>ref()</code> calls are the orchestration.</div>
       </div>
     </div>
   </div>
@@ -284,7 +284,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'int_orders_with_payments'</span>) }} op
     <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
 <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email</pre>
-        <div class="what-changed"><strong>The pattern:</strong> <code>pd.read_sql()</code> → <code>source()</code>. <code>DataFrame</code> → <code>ref()</code>. <code>to_sql()</code> → gone (dbt handles it). Data stops traveling. Computation moves to where the data lives.</div>
+        <div class="what-changed"><strong>The pattern:</strong> <code>pd.read_sql()</code> → <code>source()</code>. <code>DataFrame</code> → <code>ref()</code>. <code>to_sql()</code> → gone. Data stops traveling. Computation moves to where the data already is.</div>
       </div>
     </div>
   </div>
@@ -295,7 +295,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <!-- SECTION 4: WHAT EMERGES -->
 <div class="section">
   <p class="section-label">What emerges</p>
-  <p class="prose">The Python script had the same logical structure as these five models — it just kept that structure implicit, strung together as sequential lines of code. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call makes a dependency explicit. dbt reads them and builds the execution graph automatically.</p>
+  <p class="prose">The Python script had this same structure inside it. The same dependencies existed — they were just hidden in the order of the code. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call makes one of those dependencies explicit. dbt reads them all and builds the execution order automatically.</p>
 
   <div class="dag-wrap" style="padding:16px">
     <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px">
@@ -326,7 +326,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
       <text x="524" y="300" fill="#444c56" font-family="DM Sans,sans-serif" font-size="11" text-anchor="middle" font-style="italic">waits for stg_orders + stg_payments</text>
     </svg>
   </div>
-  <p class="caption">The Python script had this same dependency graph. It just wasn't visible — or parallel.</p>
+  <p class="caption">All of this existed inside the Python script. It just wasn't visible — and it definitely wasn't parallel.</p>
 </div>
 
 <div class="sep"></div>
@@ -334,7 +334,7 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <!-- SECTION 5: SCALE -->
 <div class="section">
   <p class="section-label">The consequence</p>
-  <p class="prose">The architectural difference compounds at scale. A Python pipeline's ceiling is your machine's memory. A dbt pipeline's ceiling is your warehouse — which you can resize without touching the code.</p>
+  <p class="prose">The difference compounds at scale. A Python pipeline's ceiling is your machine's memory. A dbt pipeline's ceiling is your warehouse — which you can resize without changing any code.</p>
 
   <div class="scale-wrap" style="margin-top:24px">
     <div class="scale-block">
@@ -364,17 +364,17 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <!-- SECTION 6: WHEN IT BREAKS -->
 <div class="section">
   <p class="section-label">When it breaks</p>
-  <p class="prose">The design philosophy becomes concrete in the failure case. Click each scenario.</p>
+  <p class="prose">This is where it actually matters. Not when things go well. When they break.</p>
 
   <div style="margin-top:24px">
     <div class="scenario">
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline OOMs on a larger dataset</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">python pipeline</div><p>MemoryError on the <code>merge()</code>. The DataFrame that caused it is gone. Re-run with a smaller sample to see what was in it, or rewrite with chunking. Data engineering work has now interrupted analytics work.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>The query runs in the warehouse. There's no local memory ceiling. If the warehouse runs out of resources, you resize it — or investigate the query plan. The code doesn't change.</p></div>
+          <div class="dc"><div class="ch">python pipeline</div><p>MemoryError on the <code>merge()</code>. The DataFrame that caused it is gone. You re-run with a smaller sample, or you rewrite with chunking. Either way — analytics work stops while you fix a plumbing problem.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>The query runs in the warehouse. There's no RAM ceiling. If the warehouse runs out of resources, you resize it. The code doesn't change.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> one architecture has a hard ceiling at your machine's RAM. The other scales with infrastructure you can adjust without touching code.</div>
+        <div class="scenario-note"><strong>The difference:</strong> one architecture hits a hard ceiling at your machine's RAM. The other scales with infrastructure — without touching code.</div>
       </div>
     </div>
 
@@ -382,10 +382,10 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Wrong row count in the final output</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">python pipeline</div><p>Add <code>print(len(df))</code> after each step, re-run the full script to capture intermediate counts. Multiple debug cycles before you find the fan-out point.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code> — how many rows? Query <code>int_orders_with_payments</code> — how many? The difference shows exactly where the problem is. No re-run needed.</p></div>
+          <div class="dc"><div class="ch">python pipeline</div><p>Add <code>print(len(df))</code> after each step, re-run the whole script, check the counts. Multiple cycles before you find where the row count changed. The intermediate DataFrames are gone — you have to recreate the state every time.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code>. How many rows? Query <code>int_orders_with_payments</code>. How many? The difference tells you exactly where it happened. No re-run needed.</p></div>
         </div>
-        <div class="scenario-note">Bisect a data problem the same way you'd bisect a software bug — without re-running anything.</div>
+        <div class="scenario-note">You can bisect a data problem the same way you'd bisect a software bug — because the intermediate state is still there.</div>
       </div>
     </div>
 
@@ -393,10 +393,10 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline crashes mid-run</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">python pipeline</div><p>All DataFrames gone. The state from steps 1–4 died with the process. Re-run from the top — same data transfers, same compute time — to reproduce the failure.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Every completed model is still in the warehouse as a real table. Run <code>dbt run -s failed_model+</code> to re-execute only what failed and its downstream dependencies.</p></div>
+          <div class="dc"><div class="ch">python pipeline</div><p>All DataFrames gone. Everything from steps 1–4 died with the process. You re-run from the top — same data transfers, same compute time — just to get back to where it was.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Every completed model is still in the warehouse. Run <code>dbt run -s failed_model+</code> and only the thing that failed re-executes. Everything upstream is already there.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> in-memory state vanishes on crash. Warehouse tables persist. That changes whether you restart from zero or from where you left off.</div>
+        <div class="scenario-note"><strong>The difference:</strong> in-memory state disappears when the process dies. Warehouse tables don't. That determines whether you restart from zero or from where you left off.</div>
       </div>
     </div>
 
@@ -404,10 +404,10 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Another team wants to reuse your clean orders logic</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">python pipeline</div><p>They copy the filter logic into their own script. Now you have two definitions of "valid order." When one gets updated, the other silently drifts. This is how data definitions diverge.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>They write <code>ref('stg_orders')</code>. They're now building on your model — same table, same definition, updated automatically when you change it. One source of truth.</p></div>
+          <div class="dc"><div class="ch">python pipeline</div><p>They copy your filter logic into their own script. Now there are two definitions of "valid order." When you update yours, theirs doesn't change. Nobody notices until the numbers diverge in a meeting.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>They write <code>ref('stg_orders')</code>. They're building on your model directly — same table, same definition. When you update it, they get the update automatically.</p></div>
         </div>
-        <div class="scenario-note">The real value of <code>ref()</code> isn't dependency tracking. It's that the same table gets reused instead of redefined.</div>
+        <div class="scenario-note">The real value of <code>ref()</code> isn't dependency tracking. It's that the table gets reused instead of copied and redefined.</div>
       </div>
     </div>
   </div>
@@ -419,9 +419,9 @@ clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_custome
 <div class="section">
   <p class="section-label">The point</p>
   <p class="conclusion">Python or SQL is the wrong question.</p>
-  <p class="conclusion">The question is: where does your computation run? On your machine — with your machine's memory as the ceiling, data traveling back and forth, intermediate state that vanishes on failure — or in the warehouse, where the data already lives, at the scale the warehouse provides?</p>
-  <p class="prose">For genuinely complex transformations — ML models, arbitrary iteration, operations that require Python libraries — the answer might be "on a machine." Use Python for those.</p>
-  <p class="prose" style="margin-top:16px">For everything that can be expressed as a set operation — which is most of what data transformation actually is — the answer is almost always "in the warehouse." Use SQL for those. Not because SQL is better, but because running compute where the data lives is a simpler architecture.</p>
+  <p class="conclusion">The real question is: where does your computation run? On your machine — with your machine's memory as the ceiling, intermediate state that vanishes when the process dies — or in the warehouse, where the data already lives and the scale is handled for you?</p>
+  <p class="prose">For genuinely complex transformations — ML models, arbitrary iteration, things that actually need Python libraries — the answer might be "on a machine." Use Python for those.</p>
+  <p class="prose" style="margin-top:16px">For everything that can be expressed as a set operation — which is most of what data transformation actually is — the answer is almost always "in the warehouse." Not because SQL is better. Because running compute where the data already lives is just a simpler architecture.</p>
   <div class="pull" style="margin-top:28px">
     The migration from a Python pipeline to dbt isn't a rewrite. It's a relocation.<br>
     The logic moves from your machine to the warehouse. Everything else — scale, parallelism, intermediate persistence — follows from that one change.<br>

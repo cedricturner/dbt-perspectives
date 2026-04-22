@@ -123,15 +123,15 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Data Modeling</div>
   <h1>The stored procedure<br>is not your enemy</h1>
-  <p class="lede">The real problem isn't the technology. It's that your pipeline was designed to execute — not to be inspected. That's a harder problem than cleaning up the SQL.</p>
+  <p class="lede">The real issue isn't the stored procedure. It's that the whole thing was built to run — not to be looked inside. That matters a lot more than cleaning up the code.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">Stored procedures work. Most teams have been using them for years. The pipeline runs nightly, the data lands, the dashboards update. The conventional argument for moving away is organizational: the code is messy, it's not in version control, it's hard to test.</p>
-  <p class="prose">All of that is true. But it frames the problem as a code quality issue — something you fix by reformatting, refactoring, and adding some Git commits.</p>
-  <p class="prose">The deeper problem isn't in the code. It's in the execution model.</p>
+  <p class="prose">Stored procedures work. That's the thing. Most teams have been running them for years without serious issues. The pipeline runs every night, the data lands, dashboards update. The standard argument for moving away is usually about the code — it's messy, not in version control, hard to test.</p>
+  <p class="prose">All of that's true. But it frames the problem as a code cleanliness thing. Like if you just reorganized the logic and added some Git commits, you'd be fine.</p>
+  <p class="prose">The actual problem is different. It's not in the code at all.</p>
 </div>
 
 <div class="sep"></div>
@@ -139,8 +139,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2: TENSION -->
 <div class="section">
   <p class="section-label">The tension</p>
-  <p class="prose">The real problem shows up when something breaks — or more precisely, what happens <em>after</em> it breaks.</p>
-  <p class="prose">A stored procedure creates temp tables, moves data through a series of steps, produces a final output, and ends. When the session ends, the temp tables disappear. The intermediate work is gone. If step 4 fails, everything from steps 1, 2, and 3 died with the session. To debug, you re-run the whole thing from the top.</p>
+  <p class="prose">The real problem shows up when something breaks. More specifically — what happens right after it breaks.</p>
+  <p class="prose">A stored procedure creates temp tables, runs data through a series of steps, produces a final output, and ends. When the session ends, those temp tables disappear. They're gone. If step 4 fails, steps 1, 2, and 3 died with it. There's nothing left to look at. To debug, you start the whole thing over from the top.</p>
 
   <div class="code-wrap" style="border-color:#f85149;margin-top:28px">
     <div class="code-head" style="background:rgba(248,81,73,.05)">
@@ -181,10 +181,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">END</span>; $$ <span style="color:#ff7b72">LANGUAGE</span> plpgsql;</pre>
     </div>
   </div>
-  <p class="caption">One file. Five logical steps. Nothing survives the session.</p>
+  <p class="caption">One file. Five steps. When it finishes — or when it fails — there's nothing left.</p>
 
   <div class="pull" style="margin-top:28px">
-    This isn't bad code. It's a reasonable implementation that does exactly what it was designed to do: execute a transformation and produce an output. The problem is that it was designed to <strong>execute</strong> — not to be inspected.
+    This isn't bad code. It does exactly what it was built to do — run a transformation and produce an output. The problem is that's all it was ever designed to do. Nobody built it to be inspected. So when it breaks, you're starting from scratch.
   </div>
 </div>
 
@@ -193,9 +193,9 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 3: THE SHIFT -->
 <div class="section">
   <p class="section-label">What actually changes</p>
-  <p class="prose">dbt doesn't change the transformation logic. The SQL is nearly identical. What changes is the execution model — and specifically, what the pipeline leaves behind after it runs.</p>
-  <p class="prose">Instead of temp tables that vanish, each step becomes a real table in your warehouse. Instead of hardcoded schema references, <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source()</code> registers data entry points. Instead of implicit ordering by line number, <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> declares dependencies explicitly.</p>
-  <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see the exact transformation — and what specifically changes.</p>
+  <p class="prose">The SQL barely changes. That's not really what dbt does. What changes is what's still there after the pipeline finishes running.</p>
+  <p class="prose">Instead of temp tables that disappear, each step becomes a real table in your warehouse. Hardcoded schema names become <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source()</code>. Implicit ordering becomes explicit dependencies with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code>.</p>
+  <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see what the actual change looks like.</p>
 
   <div class="expand-block" id="b1" onclick="toggle('b1','r1')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">CREATE TEMP TABLE tmp_customers</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Temp table</span></div>
@@ -214,7 +214,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <span style="color:#79c0ff">COALESCE</span>(first_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
     <span style="color:#79c0ff">COALESCE</span>(last_name,  <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'customers'</span>) }}</pre>
-        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. <code>CREATE TEMP TABLE</code> is gone — dbt handles materialization as config. <code>raw.customers</code> becomes <code>source('raw','customers')</code>, registering this as an official data entry point dbt can test for freshness and alert on. The result is a real, persistent, queryable table — not a session-scoped temp that vanishes.</div>
+        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. The only things that moved are the wrapper and the reference. No more <code>CREATE TEMP TABLE</code> — dbt handles materialization separately. And <code>raw.customers</code> becomes <code>source('raw','customers')</code>, which tells dbt this is an external entry point it can track and test. The result is a real table in your warehouse — not session-scoped. It's there after the run finishes, whether it succeeded or not.</div>
       </div>
     </div>
   </div>
@@ -229,7 +229,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
         <pre><span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'orders'</span>) }}
 <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span></pre>
-        <div class="what-changed"><strong>What changed:</strong> Now a standalone file. When another team needs clean orders, they use <code>ref('stg_orders')</code> instead of copy-pasting this filter logic into their own procedure. "What is a valid order" lives in one place. It can't drift.</div>
+        <div class="what-changed"><strong>What changed:</strong> Now it's its own file. When another team needs clean orders, they use <code>ref('stg_orders')</code> instead of copying this filter logic into their own thing. "What counts as a valid order" lives in one place. It doesn't drift.</div>
       </div>
     </div>
   </div>
@@ -244,7 +244,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
         <pre><span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'payments'</span>) }}
 <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span></pre>
-        <div class="what-changed"><strong>What changed:</strong> Steps 1, 2, and 3 are now independent — no dependency on each other. dbt sees they each only reference <code>source()</code> with no <code>ref()</code> between them. It runs all three simultaneously.</div>
+        <div class="what-changed"><strong>What changed:</strong> Steps 1, 2, and 3 are now independent. None of them reference each other. dbt sees that and runs all three at the same time.</div>
       </div>
     </div>
   </div>
@@ -264,7 +264,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_payments'</span>) }} p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
 <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount</pre>
-        <div class="what-changed"><strong>What changed:</strong> <code>tmp_orders</code> and <code>tmp_payments</code> become <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code>. Those <code>ref()</code> calls are dependency declarations — dbt knows to run both staging models first. You didn't write orchestration logic. The <code>ref()</code> calls <em>are</em> the orchestration.</div>
+        <div class="what-changed"><strong>What changed:</strong> <code>tmp_orders</code> and <code>tmp_payments</code> become <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code>. Those <code>ref()</code> calls tell dbt what this model needs before it can run. You don't write any orchestration logic. The <code>ref()</code> calls are the orchestration.</div>
       </div>
     </div>
   </div>
@@ -290,7 +290,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'int_orders_with_payments'</span>) }} op
     <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
 <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email</pre>
-        <div class="what-changed"><strong>The pattern:</strong> <code>CREATE TEMP TABLE</code> → SQL file. <code>raw.schema</code> → <code>source()</code>. <code>tmp_x</code> → <code>ref()</code>. Those three substitutions are the entire migration. The logic didn't change — what it leaves behind did.</div>
+        <div class="what-changed"><strong>The pattern:</strong> <code>CREATE TEMP TABLE</code> → SQL file. <code>raw.schema</code> → <code>source()</code>. <code>tmp_x</code> → <code>ref()</code>. That's the whole migration. The logic is the same. What changes is what the pipeline leaves behind when it runs.</div>
       </div>
     </div>
   </div>
@@ -301,7 +301,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 4: THE STRUCTURE EMERGES -->
 <div class="section">
   <p class="section-label">What emerges</p>
-  <p class="prose">The stored procedure had the same logical structure as these five models — it just kept it invisible. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call is a dependency declaration. dbt reads them all and builds the execution order automatically. The graph emerges from the code.</p>
+  <p class="prose">The stored procedure had this exact structure inside it. The same dependencies existed — they just weren't visible anywhere. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call you write is a dependency declaration. dbt reads them all and figures out the execution order. You don't define the graph. It comes out of the code.</p>
 
   <div class="dag-wrap" style="padding:16px">
     <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px">
@@ -332,7 +332,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <text x="524" y="300" fill="#444c56" font-family="DM Sans,sans-serif" font-size="11" text-anchor="middle" font-style="italic">waits for stg_orders + stg_payments</text>
     </svg>
   </div>
-  <p class="caption">The stored procedure had this same structure. It just wasn't visible.</p>
+  <p class="caption">All of this existed inside the stored procedure. It just wasn't visible.</p>
 </div>
 
 <div class="sep"></div>
@@ -340,7 +340,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 5: PARALLELISM -->
 <div class="section">
   <p class="section-label">The consequence</p>
-  <p class="prose">Explicit dependencies unlock something the stored procedure structurally couldn't do: parallelism. The three staging models have no dependency on each other — dbt sees that and runs them simultaneously.</p>
+  <p class="prose">Once the dependencies are explicit, dbt knows which models don't depend on each other. So it runs them at the same time. The stored procedure couldn't do that — it ran everything in order, one step after another, because there was no other option.</p>
 
   <div class="par-wrap" style="margin-top:24px">
     <div class="par-block">
@@ -370,17 +370,17 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 6: WHEN IT BREAKS -->
 <div class="section">
   <p class="section-label">When it breaks</p>
-  <p class="prose">This is where the design philosophy becomes concrete. Not in the happy path — in the failure case. Click each scenario.</p>
+  <p class="prose">This is where it actually matters. Not when things go well. When they break. Click each scenario.</p>
 
   <div style="margin-top:24px">
     <div class="scenario">
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline fails at the join step</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>Step 4 failed. The temp tables from steps 1–3 died with the session. Re-run the entire procedure from the top to reproduce the failure. Every debug cycle = full re-run.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p><code>stg_orders</code> and <code>stg_payments</code> are still in the warehouse as real tables. Run <code>dbt run -s int_orders_with_payments</code> to re-execute only the failed model.</p></div>
+          <div class="dc"><div class="ch">stored procedure</div><p>Step 4 failed. The temp tables from steps 1–3 died with the session. They're gone. To figure out what happened you have to re-run the whole thing from the top. Every single debug attempt is a full re-run.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p><code>stg_orders</code> and <code>stg_payments</code> are still in the warehouse. Run <code>dbt run -s int_orders_with_payments</code> to re-execute just the thing that failed.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> dbt models are real tables. Stored proc temps aren't. That's the whole game.</div>
+        <div class="scenario-note"><strong>The difference:</strong> dbt models are real warehouse tables. Stored proc temps aren't. That's really the whole thing.</div>
       </div>
     </div>
 
@@ -388,10 +388,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Wrong row count in the final output</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>Add debug temp tables mid-proc, re-run everything, and manually query each one. Multiple cycles to isolate where the fan-out happened.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code> — how many rows? Query <code>int_orders_with_payments</code> — how many? The difference shows exactly where the problem is. No re-run needed.</p></div>
+          <div class="dc"><div class="ch">stored procedure</div><p>Add debug tables mid-proc, re-run everything, query each one. You're doing this multiple times before you find where the rows got out of control.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code>. How many rows? Query <code>int_orders_with_payments</code>. How many? The difference tells you exactly where the problem is. No re-run needed.</p></div>
         </div>
-        <div class="scenario-note">Bisect a data problem the same way you'd bisect a software bug — without re-running anything.</div>
+        <div class="scenario-note">Same approach you'd use to bisect a code bug. Except you don't have to re-run anything.</div>
       </div>
     </div>
 
@@ -399,8 +399,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Upstream schema change — a column renamed</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>The proc fails or silently returns NULLs. Trace back through the file to find which temp table was affected. Hope nothing downstream was reading from it.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p><code>stg_payments</code> is the only model touching <code>raw.payments</code>. Fix it there. Every downstream model gets the fix automatically. One change point.</p></div>
+          <div class="dc"><div class="ch">stored procedure</div><p>The proc fails or silently returns NULLs. You trace back through the file to figure out which temp table got hit. Then you hope nothing downstream was depending on it.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p><code>stg_payments</code> is the only model that touches <code>raw.payments</code>. Fix it there. Everything downstream picks up the change automatically.</p></div>
         </div>
         <div class="scenario-note">The <code>stg_</code> layer is an isolation boundary. Raw schema changes only affect one file.</div>
       </div>
@@ -410,8 +410,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">3am on-call alert fires</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>No intermediate state survives. Re-run the full procedure to reproduce. Add <code>RAISE NOTICE</code> calls. Re-run again. 45+ minutes before you start fixing.</p></div>
-          <div class="dc"><div class="ch">dbt</div><p>Run logs show the exact model that failed and the exact error. Intermediate models are still in the warehouse. Fix and re-run only the failed model and its downstream dependencies.</p></div>
+          <div class="dc"><div class="ch">stored procedure</div><p>Nothing survived from the last run. You have to re-run the whole thing just to reproduce the failure. Then add <code>RAISE NOTICE</code> calls. Re-run again. You're 45 minutes in before you've even started fixing anything.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>The run logs tell you exactly which model failed and why. The intermediate models are still in the warehouse. Fix the issue, re-run just that model and what depends on it.</p></div>
         </div>
         <div class="scenario-note">The engineer on-call at 3am cares a lot about whether the intermediate state survived.</div>
       </div>
@@ -425,13 +425,13 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="section">
   <p class="section-label">The point</p>
   <p class="conclusion">The stored procedure is not your enemy.</p>
-  <p class="conclusion">The invisible pipeline is — the one that executes and disappears, leaving you nothing to inspect when something goes wrong. The one where debugging means archaeology: reconstructing what happened from scratch because no evidence survived.</p>
-  <p class="prose">dbt solves that not by being a better query runner, but by making every intermediate step a persistent artifact. The pipeline runs. The tables survive. You debug from evidence instead of memory.</p>
-  <p class="prose" style="margin-top:16px">When you evaluate any data pipeline, ask one question: <em>what does it leave behind when it runs?</em></p>
+  <p class="conclusion">The invisible pipeline is. The one that runs and disappears. The one that leaves you nothing to look at when something goes wrong. Debugging it means starting over every time, because nothing survived.</p>
+  <p class="prose">dbt fixes that not by being a better query runner — the SQL is basically the same. It fixes it by making every step a real table that sticks around. The pipeline runs. The tables survive. When something breaks, you start from evidence, not from memory.</p>
+  <p class="prose" style="margin-top:16px">When you're evaluating any data pipeline, there's one question worth asking: <em>what does it leave behind when it runs?</em></p>
   <div class="pull" style="margin-top:28px">
-    If the answer is only the final output, you're one failure away from starting over blind.<br>
-    If the answer is every intermediate step as a queryable table, you're debugging from evidence instead of memory.<br>
-    <em>That's what the migration is actually about. The SQL syntax is almost beside the point.</em>
+    If the answer is just the final output — you're one failure away from starting from scratch.<br>
+    If the answer is every intermediate step as a real table you can query — you're debugging from evidence.<br>
+    <em>That's what the migration is actually about. The SQL is almost beside the point.</em>
   </div>
 </div>
 
