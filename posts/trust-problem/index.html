@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data teams don't have a quality problem. They have a trust problem. — dbt perspectives</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:820px;margin:0 auto;padding:48px 24px 100px}
+
+.back{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-block;margin-bottom:52px;transition:color .15s}
+.back:hover{color:#8b949e}
+
+.hero{margin-bottom:56px}
+.hero-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);padding:3px 10px;border-radius:99px;margin-bottom:18px}
+.hero h1{font-size:clamp(26px,5vw,42px);font-weight:600;line-height:1.12;color:#fff;margin-bottom:16px;letter-spacing:-.4px}
+.hero .lede{font-size:16px;color:#8b949e;line-height:1.72;max-width:600px}
+
+.section{margin-bottom:60px}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#ff6b35;opacity:.75;margin-bottom:18px}
+.prose{font-size:15px;color:#c9d1d9;line-height:1.78;max-width:640px;margin-bottom:16px}
+.prose strong{color:#e6edf3}
+.prose em{color:#8b949e}
+
+.sep{height:1px;background:linear-gradient(90deg,transparent,#21262d 15%,#21262d 85%,transparent);margin:56px 0}
+
+.pull{margin:28px 0;padding:18px 24px;background:rgba(255,107,53,.05);border-left:3px solid #ff6b35;border-radius:0 7px 7px 0;font-size:15px;color:#e6edf3;line-height:1.65}
+.pull em{color:#8b949e;font-size:13px;display:block;margin-top:6px}
+
+.caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;margin-top:10px;line-height:1.55}
+
+/* Revenue comparison table */
+.rev-table{width:100%;border-radius:9px;overflow:hidden;border:1px solid #2d333b;margin-bottom:12px}
+.rev-table th{background:#161b22;padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid #2d333b}
+.rev-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #161b22;vertical-align:top}
+.rev-table tr:last-child td{border-bottom:none}
+.rev-table tr:hover td{background:rgba(255,255,255,.02)}
+.team-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600}
+.num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
+.test-pass{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:99px;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.2)}
+.def-note{font-size:11px;color:#8b949e;margin-top:2px;line-height:1.5}
+
+/* After dbt — single source */
+.single-source{background:#0c1a0c;border:1px solid rgba(63,185,80,.25);border-radius:9px;padding:20px 22px;margin-bottom:12px}
+.ss-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.ss-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3fb950;font-weight:600;letter-spacing:.5px}
+.ss-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.2)}
+.ss-model{background:#080f08;border-radius:6px;padding:12px 15px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:#e6edf3}
+.ss-refs{display:flex;flex-wrap:wrap;gap:8px}
+.ss-ref{font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.2);border-radius:5px;color:#58a6ff}
+
+/* Visibility vs tests comparison */
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.compare-block{background:#161b22;border:1px solid #2d333b;border-radius:9px;padding:16px}
+.compare-block h4{font-size:10px;font-weight:600;margin-bottom:14px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.compare-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:9px}
+.compare-icon{font-size:11px;margin-top:1px;flex-shrink:0}
+.compare-text{font-size:12px;color:#8b949e;line-height:1.55}
+.compare-text strong{color:#e6edf3}
+
+/* Scenario styling */
+.scenario{margin-bottom:10px;border-radius:9px;overflow:hidden;border:1px solid #2d333b}
+.scenario-trigger{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#161b22;user-select:none}
+.scenario-trigger:hover{background:#1c2129}
+.scenario-trigger .sname{font-size:13px;font-weight:500}
+.chevron{color:#8b949e;font-size:11px;transition:transform .2s}
+.scenario-trigger.open .chevron{transform:rotate(180deg)}
+.scenario-body{display:none}
+.scenario-body.show{display:block}
+.scenario-split{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2d333b}
+.dc{padding:13px 15px}
+.dc:first-child{border-right:1px solid #2d333b;background:rgba(248,81,73,.03)}
+.dc:last-child{background:rgba(63,185,80,.03)}
+.dc .ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.dc:first-child .ch{color:#f85149}
+.dc:last-child .ch{color:#3fb950}
+.dc p{font-size:12px;color:#8b949e;line-height:1.6}
+.dc code{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,.07);padding:1px 4px;border-radius:3px;color:#e6edf3}
+.scenario-note{font-size:12px;color:#8b949e;padding:10px 15px;background:#0e1117;border-top:1px solid #2d333b;line-height:1.55}
+.scenario-note strong{color:#e6edf3}
+
+.conclusion{font-size:16px;color:#e6edf3;line-height:1.78;max-width:600px;margin-bottom:16px}
+
+.post-footer{margin-top:60px;padding-top:24px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.footer-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;transition:color .15s}
+.footer-back:hover{color:#8b949e}
+.footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
+.footer-gh a:hover{color:#8b949e}
+
+@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a href="../../" class="back">← dbt perspectives</a>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Adoption &amp; Culture</div>
+  <h1>Data teams don't have<br>a quality problem.<br>They have a trust problem.</h1>
+  <p class="lede">Tests tell you when something broke. They don't make the pipeline legible. Most teams rebuild the same model five times — not because the first one was broken, but because they couldn't tell whether it was right.</p>
+</div>
+
+<!-- SECTION 1: INTUITION -->
+<div class="section">
+  <p class="section-label">What people think</p>
+  <p class="prose">The standard response to "I don't trust the data" is: add more tests. Write assertions. Check row counts. Test uniqueness. Expand coverage. It's an engineering instinct — if something can break, add a guard.</p>
+  <p class="prose">It's not a wrong instinct. But it's aimed at a different problem than the one most teams actually have.</p>
+  <p class="prose">Most data teams don't distrust their pipelines because they produce wrong data. They distrust them because they can't <em>tell</em> whether the data is right. Those are different problems — and they have different solutions.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 2: TENSION -->
+<div class="section">
+  <p class="section-label">The tension</p>
+  <p class="prose">Here's the canonical symptom: two teams are presenting to the same executive. Revenue for Q3. Different numbers. Both teams built their models carefully. Both are passing their tests.</p>
+  <p class="prose">The meeting turns into a definition negotiation. Whose number is right? What counts as revenue — gross, net, recognized? Are refunds subtracted? How does it handle the month-end edge case? Nobody knows, because the pipelines are opaque — you'd have to read the scripts to find out.</p>
+
+  <div style="margin-top:28px;margin-bottom:8px">
+    <table class="rev-table">
+      <tr>
+        <th>team</th>
+        <th>Q3 revenue</th>
+        <th>tests</th>
+        <th>definition edge case</th>
+      </tr>
+      <tr>
+        <td><span class="team-pill" style="background:rgba(88,166,255,.1);color:#58a6ff;border:1px solid rgba(88,166,255,.2)">Finance</span></td>
+        <td><span class="num" style="color:#e6edf3">$2,143,000</span></td>
+        <td><span class="test-pass">✓ passing</span></td>
+        <td><div class="def-note">Excludes refunds. Includes pending.</div></td>
+      </tr>
+      <tr>
+        <td><span class="team-pill" style="background:rgba(210,153,34,.1);color:#d29922;border:1px solid rgba(210,153,34,.2)">Growth</span></td>
+        <td><span class="num" style="color:#e6edf3">$1,987,000</span></td>
+        <td><span class="test-pass">✓ passing</span></td>
+        <td><div class="def-note">Net of refunds. Excludes pending.</div></td>
+      </tr>
+      <tr>
+        <td><span class="team-pill" style="background:rgba(163,113,247,.1);color:#a371f7;border:1px solid rgba(163,113,247,.2)">Sales Ops</span></td>
+        <td><span class="num" style="color:#e6edf3">$2,301,000</span></td>
+        <td><span class="test-pass">✓ passing</span></td>
+        <td><div class="def-note">Includes tax. Booked date, not close date.</div></td>
+      </tr>
+      <tr>
+        <td><span class="team-pill" style="background:rgba(63,185,80,.1);color:#3fb950;border:1px solid rgba(63,185,80,.2)">Analytics</span></td>
+        <td><span class="num" style="color:#e6edf3">$2,074,000</span></td>
+        <td><span class="test-pass">✓ passing</span></td>
+        <td><div class="def-note">Close date. Net of refunds and discounts.</div></td>
+      </tr>
+      <tr>
+        <td><span class="team-pill" style="background:rgba(248,81,73,.1);color:#f85149;border:1px solid rgba(248,81,73,.2)">Data Eng</span></td>
+        <td><span class="num" style="color:#e6edf3">$2,218,000</span></td>
+        <td><span class="test-pass">✓ passing</span></td>
+        <td><div class="def-note">Recognition date. Includes deferred.</div></td>
+      </tr>
+    </table>
+  </div>
+  <p class="caption">Five teams. Five numbers. All passing tests. Nobody wrong — they just answered different questions.</p>
+
+  <div class="pull" style="margin-top:28px">
+    Tests confirmed each model was internally consistent. They didn't — and couldn't — tell anyone which model was <strong>canonical</strong>. That's a visibility problem, not a quality problem.
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 3: WHAT CHANGES -->
+<div class="section">
+  <p class="section-label">What actually changes</p>
+  <p class="prose">Tests and visibility are different capabilities. Tests verify correctness: when a constraint is violated, you find out. Visibility makes the pipeline legible: anyone can inspect what it does, trace intermediate steps, and understand the definition without reading the source code.</p>
+
+  <div class="compare-wrap" style="margin-top:24px;margin-bottom:28px">
+    <div class="compare-block">
+      <h4>what tests give you</h4>
+      <div class="compare-row"><span class="compare-icon">✓</span><div class="compare-text"><strong>Correctness signals</strong> — know when a constraint breaks</div></div>
+      <div class="compare-row"><span class="compare-icon">✓</span><div class="compare-text"><strong>Regression detection</strong> — know when an update breaks something</div></div>
+      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Can't tell you if the <em>logic</em> is right, only if it's internally consistent</div></div>
+      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Don't tell another team what the model actually does</div></div>
+      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Don't prevent two teams from defining "revenue" differently</div></div>
+    </div>
+    <div class="compare-block">
+      <h4>what visibility gives you</h4>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Inspectability</strong> — anyone can query intermediate steps</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Reusability</strong> — others can build on your model instead of rebuilding it</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Single definition</strong> — <code>ref('stg_orders')</code> everywhere means one answer</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Transfer of trust</strong> — "I trust it because I can see it" extends beyond the original author</div></div>
+    </div>
+  </div>
+
+  <p class="prose">The shift dbt enables isn't primarily the test framework. It's that every intermediate step is a real, persistent, queryable table. When another team wants to understand your revenue model, they don't schedule a meeting — they run a SELECT.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 4: SINGLE SOURCE -->
+<div class="section">
+  <p class="section-label">What emerges</p>
+  <p class="prose">When the canonical definition lives in one dbt model — and every team references it with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> — there's no longer a "which revenue?" meeting. There's one answer. It might still be wrong in some people's eyes, but at least the argument is about the definition, not about whose calculation to trust.</p>
+
+  <div style="margin-top:28px">
+    <div class="single-source">
+      <div class="ss-head">
+        <span class="ss-title">models/marts/fct_revenue.sql — one canonical model</span>
+        <span class="ss-badge">all teams reference this</span>
+      </div>
+      <div class="ss-model"><span style="color:#8b949e">-- The definition lives here. Change it once, every ref() gets the update.</span>
+<span style="color:#ff7b72">SELECT</span>
+    o.order_id,
+    o.close_date,
+    o.total_amount - <span style="color:#79c0ff">COALESCE</span>(r.refund_amount, <span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> net_revenue,
+    o.is_recognized
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
+<span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_refunds'</span>) }} r <span style="color:#ff7b72">ON</span> o.order_id = r.order_id
+<span style="color:#ff7b72">WHERE</span> o.status = <span style="color:#a5d6ff">'closed'</span>
+  <span style="color:#ff7b72">AND</span> o.is_recognized = <span style="color:#ff7b72">true</span></div>
+      <div style="margin-bottom:10px;font-size:12px;color:#8b949e">Every team that needs revenue references this model:</div>
+      <div class="ss-refs">
+        <span class="ss-ref">ref('fct_revenue') — Finance</span>
+        <span class="ss-ref">ref('fct_revenue') — Growth</span>
+        <span class="ss-ref">ref('fct_revenue') — Sales Ops</span>
+        <span class="ss-ref">ref('fct_revenue') — Analytics</span>
+        <span class="ss-ref">ref('fct_revenue') — Data Eng</span>
+      </div>
+    </div>
+  </div>
+  <p class="caption">Five teams. One number. The definition debate becomes a PR review — not a recurring meeting.</p>
+
+  <div class="pull" style="margin-top:28px">
+    The "five versions of revenue" problem isn't a definition problem. It's a visibility problem. When there's one canonical table that everyone can query and inspect, the question shifts from "whose number?" to "is this definition right?" — which is a much more productive conversation.
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 5: CONSEQUENCE -->
+<div class="section">
+  <p class="section-label">The consequence</p>
+  <p class="prose">The downstream effect of opaque pipelines isn't usually a data quality failure. It's a duplication failure. Teams stop trusting shared infrastructure and start maintaining their own private copies.</p>
+  <p class="prose">Over time, the organization ends up with five "revenue" definitions, three "customer" definitions, and a permanent low-grade argument about whose numbers are right. Every new analyst who joins inherits this confusion. Every new dashboard adds to it.</p>
+  <p class="prose">The fix isn't more tests. Tests don't prevent duplication — they just make each duplicate slightly more reliable. Visibility prevents duplication, because when people can inspect what a model does, they build on top of it instead of alongside it.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 6: WHEN IT BREAKS -->
+<div class="section">
+  <p class="section-label">When it breaks</p>
+  <p class="prose">Trust failures look different from quality failures. Click each scenario.</p>
+
+  <div style="margin-top:24px">
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A number looks off in a dashboard</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">opaque pipeline</div><p>Alert fires. The on-call analyst checks the dashboard and can't tell where the number comes from. They Slack the data engineer who built it. Three hours later: "looks like a data quality issue." Nobody can see inside the model to confirm.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Query <code>fct_revenue</code>. Does the row count look right? Query <code>stg_orders</code> for the same date range. The discrepancy is visible without a human expert to mediate. The model is the documentation.</p></div>
+        </div>
+        <div class="scenario-note"><strong>The difference:</strong> in an opaque pipeline, debugging requires the person who built it. In a visible pipeline, anyone who can write SQL can investigate.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">New analyst joins and needs to understand the data</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The onboarding doc says "use the revenue table." The analyst queries it and gets a number that doesn't match last week's exec review. They schedule a meeting with three people to understand why. This happens four times in their first month.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The analyst reads <code>fct_revenue.sql</code>. They can see exactly what's included and excluded. They can trace upstream to <code>stg_orders</code> and see where the data comes from. Questions answered without a meeting.</p></div>
+        </div>
+        <div class="scenario-note">Every meeting to "align on definitions" is a visibility failure that should have been a SQL file.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Two teams have different numbers in the same exec review</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The meeting stalls. Someone says "let's take this offline." An action item is created to "align on revenue definition." This action item recurs quarterly. Nobody has time to fix it. The distrust compounds.</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Both teams reference <code>ref('fct_revenue')</code>. They get the same number. If there's disagreement about whether that number is right, it's a discussion about the model definition — which has a PR, a history, and a clear owner.</p></div>
+        </div>
+        <div class="scenario-note"><strong>The difference:</strong> one shared model makes disagreements concrete ("the model excludes refunds — should it?") instead of diffuse ("we have different numbers — why?").</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A staging model gets updated</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">opaque pipeline</div><p>The analyst updates their script. Two weeks later, three dashboards start showing different numbers. Nobody knows what changed or which reports are affected. A post-mortem is scheduled to "trace the lineage manually."</p></div>
+          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>dbt's lineage graph shows exactly which downstream models reference <code>stg_orders</code>. Run <code>dbt run -s stg_orders+</code> to re-execute everything that depends on it. Impact is visible before and after the change.</p></div>
+        </div>
+        <div class="scenario-note">Lineage is a byproduct of visibility. You don't build it — it emerges from <code>ref()</code> calls that already had to exist.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 7: THE POINT -->
+<div class="section">
+  <p class="section-label">The point</p>
+  <p class="conclusion">Data teams don't have a quality problem. They have a trust problem.</p>
+  <p class="conclusion">And trust isn't built by adding more tests to the same opaque pipeline. Trust is built when people can look inside the pipeline — when the intermediate steps are real tables they can query, when the definition lives in one file they can read, when a new analyst can understand the model without booking a meeting.</p>
+  <p class="prose">Tests are necessary. They're not sufficient. A pipeline can pass all its tests and still be trusted by nobody — because trust requires legibility, and legibility requires visibility.</p>
+  <p class="prose" style="margin-top:16px">The question to ask about any data platform: <em>can a person I've never met understand what this model does by reading it?</em> If yes, trust can transfer. If no, it's locked in the head of whoever built it.</p>
+  <div class="pull" style="margin-top:28px">
+    Most data teams don't rebuild because the platform is unreliable. They rebuild because they can't see inside it.<br>
+    "I trust it" usually means "I built it." That's not a quality problem — it's a visibility problem.<br>
+    <em>Making intermediate state persistent and visible doesn't improve data quality. It transfers trust.</em>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="post-footer">
+  <a href="../../" class="footer-back">← dbt perspectives</a>
+  <div class="footer-gh"><a href="https://github.com/cedricturner/dbt-perspectives" target="_blank" rel="noopener noreferrer"><svg height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>view source</a></div>
+</div>
+
+</div>
+<script>
+function toggleScenario(t){
+  var b=t.nextElementSibling,open=b.classList.contains('show');
+  b.classList.toggle('show',!open);
+  t.classList.toggle('open',!open);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What moving to dbt actually changes — dbt perspectives</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-height:100vh;overflow-x:hidden}
+.wrap{max-width:820px;margin:0 auto;padding:48px 24px 100px}
+
+.back{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-block;margin-bottom:52px;transition:color .15s}
+.back:hover{color:#8b949e}
+
+.hero{margin-bottom:56px}
+.hero-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#ff6b35;background:rgba(255,107,53,.08);border:1px solid rgba(255,107,53,.2);padding:3px 10px;border-radius:99px;margin-bottom:18px}
+.hero h1{font-size:clamp(26px,5vw,42px);font-weight:600;line-height:1.12;color:#fff;margin-bottom:16px;letter-spacing:-.4px}
+.hero .lede{font-size:16px;color:#8b949e;line-height:1.72;max-width:600px}
+
+.section{margin-bottom:60px}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#ff6b35;opacity:.75;margin-bottom:18px}
+.prose{font-size:15px;color:#c9d1d9;line-height:1.78;max-width:640px;margin-bottom:16px}
+.prose strong{color:#e6edf3}
+.prose em{color:#8b949e}
+
+.sep{height:1px;background:linear-gradient(90deg,transparent,#21262d 15%,#21262d 85%,transparent);margin:56px 0}
+
+.pull{margin:28px 0;padding:18px 24px;background:rgba(255,107,53,.05);border-left:3px solid #ff6b35;border-radius:0 7px 7px 0;font-size:15px;color:#e6edf3;line-height:1.65}
+.pull em{color:#8b949e;font-size:13px;display:block;margin-top:6px}
+
+.caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;margin-top:10px;line-height:1.55}
+
+.code-wrap{border-radius:9px;overflow:hidden;border:2px solid #2d333b;margin-bottom:12px;transition:border-color .2s}
+.code-head{display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:#161b22;border-bottom:1px solid #2d333b}
+.lbl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.3px}
+.badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.code-body{background:#0d1117;padding:15px 17px;overflow-x:auto}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.72;color:#e6edf3;white-space:pre}
+.il{display:block;margin:0 -17px;padding:0 17px;border-left:3px solid #f85149;background:rgba(248,81,73,.09)}
+.wl{display:block;margin:0 -17px;padding:0 17px;border-left:3px solid #d29922;background:rgba(210,153,34,.07)}
+.in{color:#f85149;font-size:10px;font-style:italic}
+.wn{color:#d29922;font-size:10px;font-style:italic}
+.pn{color:#8b949e;font-size:10px;font-style:italic}
+
+.expand-block{cursor:pointer;border:2px solid #2d333b;border-radius:9px;overflow:hidden;margin-bottom:10px;transition:border-color .2s}
+.expand-block .code-head::after{content:'click to see in dbt →';font-family:'DM Sans',sans-serif;font-size:10px;color:#58a6ff;opacity:.6;font-weight:500}
+.expand-block:hover{border-color:#58a6ff}
+.expand-block:hover .code-head::after{opacity:1}
+.expand-block.open{border-color:#3fb950}
+.expand-block.open .code-head::after{content:'▲ collapse';opacity:.5}
+.dbt-reveal{display:none;border-top:1px solid #2d333b}
+.dbt-reveal.show{display:block}
+.dbt-arrow{display:flex;align-items:center;gap:9px;padding:9px 17px;background:#0a120a;border-bottom:1px dashed #2d333b}
+.dbt-arrow span{font-size:10px;color:#8b949e;font-family:'JetBrains Mono',monospace}
+.dbt-arrow .arr{color:#3fb950;font-weight:600}
+.dbt-body{padding:13px 17px;background:#080f08}
+.dbt-body pre{font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.72;white-space:pre;color:#e6edf3}
+.what-changed{background:#0c1a0c;border:1px solid rgba(63,185,80,.18);border-radius:7px;padding:11px 13px;margin-top:9px;font-size:12px;line-height:1.6;color:#8b949e}
+.what-changed strong{color:#3fb950}
+
+.dag-wrap{overflow-x:auto;padding:10px 0;margin-bottom:8px;background:#0d1117;border:1px solid #2d333b;border-radius:9px}
+
+.scale-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.scale-block{background:#161b22;border:1px solid #2d333b;border-radius:9px;padding:16px}
+.scale-block h4{font-size:10px;font-weight:600;margin-bottom:14px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
+.scale-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #21262d}
+.scale-row:last-child{border-bottom:none}
+.scale-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:#8b949e}
+.scale-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+
+.scenario{margin-bottom:10px;border-radius:9px;overflow:hidden;border:1px solid #2d333b}
+.scenario-trigger{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#161b22;user-select:none}
+.scenario-trigger:hover{background:#1c2129}
+.scenario-trigger .sname{font-size:13px;font-weight:500}
+.chevron{color:#8b949e;font-size:11px;transition:transform .2s}
+.scenario-trigger.open .chevron{transform:rotate(180deg)}
+.scenario-body{display:none}
+.scenario-body.show{display:block}
+.scenario-split{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2d333b}
+.dc{padding:13px 15px}
+.dc:first-child{border-right:1px solid #2d333b;background:rgba(248,81,73,.03)}
+.dc:last-child{background:rgba(63,185,80,.03)}
+.dc .ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.dc:first-child .ch{color:#f85149}
+.dc:last-child .ch{color:#3fb950}
+.dc p{font-size:12px;color:#8b949e;line-height:1.6}
+.dc code{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,.07);padding:1px 4px;border-radius:3px;color:#e6edf3}
+.scenario-note{font-size:12px;color:#8b949e;padding:10px 15px;background:#0e1117;border-top:1px solid #2d333b;line-height:1.55}
+.scenario-note strong{color:#e6edf3}
+
+.conclusion{font-size:16px;color:#e6edf3;line-height:1.78;max-width:600px;margin-bottom:16px}
+
+.post-footer{margin-top:60px;padding-top:24px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.footer-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;transition:color .15s}
+.footer-back:hover{color:#8b949e}
+.footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
+.footer-gh a:hover{color:#8b949e}
+
+@media(max-width:580px){.scale-wrap{grid-template-columns:1fr}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a href="../../" class="back">← dbt perspectives</a>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Data Engineering</div>
+  <h1>What moving to dbt<br>actually changes</h1>
+  <p class="lede">It's not the SQL syntax, the version control, or the modular files. It's that computation moves from your machine to the warehouse — and that changes everything about how you debug, scale, and build on top of it.</p>
+</div>
+
+<!-- SECTION 1: INTUITION -->
+<div class="section">
+  <p class="section-label">What people think</p>
+  <p class="prose">The comparison gets framed as a language debate. You have a Python pipeline — Pandas, SQLAlchemy, maybe some Spark — and someone says dbt is just SQL. So the evaluation becomes: what does your team prefer, and what does your data require?</p>
+  <p class="prose">Teams with sophisticated Python pipelines often dismiss dbt early. "We already have modular functions. We already have unit tests. Why rewrite everything in SQL?"</p>
+  <p class="prose">It's a reasonable question. But it's aimed at the wrong variable.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 2: TENSION -->
+<div class="section">
+  <p class="section-label">The tension</p>
+  <p class="prose">The language isn't what determines whether this pipeline works at scale. The location does.</p>
+  <p class="prose">A Pandas pipeline pulls data <em>to your machine</em>, transforms it in memory, and writes the result back. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql()</code> is a data transfer. Every DataFrame is in-memory state that exists only as long as the process runs. When it fails, everything in memory is gone.</p>
+
+  <div class="code-wrap" style="border-color:#f85149;margin-top:28px">
+    <div class="code-head" style="background:rgba(248,81,73,.05)">
+      <span class="lbl" style="color:#f85149">build_customer_order_summary.py — pandas pipeline</span>
+      <span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">1 file · 6 steps</span>
+    </div>
+    <div class="code-body"><pre><span style="color:#ff7b72">import</span> pandas <span style="color:#ff7b72">as</span> pd
+<span style="color:#ff7b72">from</span> sqlalchemy <span style="color:#ff7b72">import</span> create_engine
+
+engine = create_engine(<span style="color:#a5d6ff">"postgresql://..."</span>)
+
+<span class="il"><span style="color:#8b949e"># Step 1 — pull ALL rows to this machine</span>  <span class="in">⚠ data transfer — grows with table size</span></span>
+<span class="il">raw_customers = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.customers"</span>, engine)  <span class="in">⚠ hardcoded schema</span></span>
+<span class="il">raw_orders    = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.orders"</span>,    engine)  <span class="in">⚠ hardcoded schema</span></span>
+<span class="il">raw_payments  = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.payments"</span>,  engine)  <span class="in">⚠ hardcoded schema</span></span>
+
+<span class="wl"><span style="color:#8b949e"># Step 2 — transform in memory  <span class="wn">⚡ DataFrame — gone if process crashes</span></span></span>
+clean_customers = raw_customers.copy()
+clean_customers[<span style="color:#a5d6ff">"email"</span>]      = clean_customers[<span style="color:#a5d6ff">"email"</span>].str.strip().str.lower()
+clean_customers[<span style="color:#a5d6ff">"first_name"</span>] = clean_customers[<span style="color:#a5d6ff">"first_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)
+clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_customers[<span style="color:#a5d6ff">"last_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)
+
+<span class="wl"><span style="color:#8b949e"># Step 3 — filter orders (in memory)  <span class="wn">⚡ DataFrame — not queryable after crash</span></span></span>
+clean_orders = (raw_orders
+    .loc[raw_orders[<span style="color:#a5d6ff">"status"</span>] != <span style="color:#a5d6ff">"cancelled"</span>,
+         [<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"order_date"</span>, <span style="color:#a5d6ff">"total_amount"</span>]])
+
+<span class="wl"><span style="color:#8b949e"># Step 4 — filter payments (in memory)  <span class="wn">⚡ DataFrame — serial, must wait for step 3</span></span></span>
+clean_payments = (raw_payments
+    .loc[raw_payments[<span style="color:#a5d6ff">"amount"</span>] &gt; 0]
+    .rename(columns={<span style="color:#a5d6ff">"amount"</span>: <span style="color:#a5d6ff">"payment_amount"</span>})
+    [[<span style="color:#a5d6ff">"payment_id"</span>, <span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"payment_amount"</span>]])
+
+<span style="color:#8b949e"># Step 5 — join</span>
+pmt_by_order     = clean_payments.groupby(<span style="color:#a5d6ff">"order_id"</span>, as_index=<span style="color:#ff7b72">False</span>)[<span style="color:#a5d6ff">"payment_amount"</span>].sum()
+orders_w_pmts    = clean_orders.merge(pmt_by_order, on=<span style="color:#a5d6ff">"order_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)
+
+<span style="color:#8b949e"># Step 6 — aggregate and write back to warehouse</span>
+<span class="il">summary = (clean_customers  <span class="in">⚠ full replace every run</span></span>
+    .merge(orders_w_pmts, on=<span style="color:#a5d6ff">"customer_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)
+    .groupby([<span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"email"</span>], as_index=<span style="color:#ff7b72">False</span>)
+    .agg(lifetime_orders=(<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"count"</span>),
+         lifetime_revenue=(<span style="color:#a5d6ff">"total_amount"</span>, <span style="color:#a5d6ff">"sum"</span>)))
+<span class="il">summary.to_sql(<span style="color:#a5d6ff">"fct_customer_order_summary"</span>, engine,  <span class="in">⚠ data travels back to warehouse</span></span>
+              schema=<span style="color:#a5d6ff">"analytics"</span>, if_exists=<span style="color:#a5d6ff">"replace"</span>, index=<span style="color:#ff7b72">False</span>)</pre>
+    </div>
+  </div>
+  <p class="caption">One file. Data moves to your machine and back. Everything in memory disappears on crash or scale limits.</p>
+
+  <div class="pull" style="margin-top:28px">
+    This isn't bad code. It's reasonable Python that does exactly what it was designed to do. The problem is the architecture: computation happens on your machine, which means the data has to travel there — and your machine's memory is the ceiling.
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 3: WHAT CHANGES -->
+<div class="section">
+  <p class="section-label">What actually changes</p>
+  <p class="prose">dbt doesn't replace Python with SQL. It moves the computation from your machine into the warehouse — where the data already lives. The transformation logic is nearly identical. What changes is where it runs.</p>
+  <p class="prose">Instead of <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">pd.read_sql("SELECT * FROM raw.customers")</code>, you write <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source('raw','customers')</code> — and the warehouse handles it. Instead of DataFrames in memory, each step is a real, persistent table. Instead of a Python script that vanishes when it runs, a set of dbt models that leave evidence behind.</p>
+  <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see the transformation — and what specifically moves.</p>
+
+  <div class="expand-block" id="b1" onclick="toggle('b1','r1')">
+    <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">pd.read_sql("SELECT * FROM raw.customers")</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Data transfer</span></div>
+    <div class="code-body"><pre><span class="il">raw_customers = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.customers"</span>, engine)  <span class="in">⚠ pulls all rows to machine</span></span>
+
+clean_customers = raw_customers.copy()
+clean_customers[<span style="color:#a5d6ff">"email"</span>]      = clean_customers[<span style="color:#a5d6ff">"email"</span>].str.strip().str.lower()
+<span class="wl">clean_customers[<span style="color:#a5d6ff">"first_name"</span>] = clean_customers[<span style="color:#a5d6ff">"first_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)  <span class="wn">⚡ in-memory only</span></span>
+clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_customers[<span style="color:#a5d6ff">"last_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)</pre></div>
+    <div class="dbt-reveal" id="r1">
+      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_customers.sql</strong></span></div>
+      <div class="dbt-body">
+        <pre><span style="color:#8b949e">-- No read_sql(). No DataFrame. Just SELECT — runs inside the warehouse.</span>
+<span style="color:#ff7b72">SELECT</span>
+    customer_id,
+    <span style="color:#79c0ff">TRIM</span>(<span style="color:#79c0ff">LOWER</span>(email))              <span style="color:#ff7b72">AS</span> email,
+    <span style="color:#79c0ff">COALESCE</span>(first_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
+    <span style="color:#79c0ff">COALESCE</span>(last_name,  <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'customers'</span>) }}</pre>
+        <div class="what-changed"><strong>What changed:</strong> The transformation logic is identical. What moved is where it runs. <code>pd.read_sql()</code> transfers data to your machine; <code>source()</code> tells the warehouse to read locally. The result is a real, persistent warehouse table — not a Python object that vanishes when the process exits.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="expand-block" id="b2" onclick="toggle('b2','r2')">
+    <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">clean_orders = raw_orders.loc[status != 'cancelled']</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">In-memory filter</span></div>
+    <div class="code-body"><pre><span class="wl">clean_orders = (raw_orders  <span class="wn">⚡ in-memory DataFrame — gone on crash</span></span>
+    .loc[raw_orders[<span style="color:#a5d6ff">"status"</span>] != <span style="color:#a5d6ff">"cancelled"</span>,
+         [<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"order_date"</span>, <span style="color:#a5d6ff">"total_amount"</span>]])</pre></div>
+    <div class="dbt-reveal" id="r2">
+      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_orders.sql</strong></span></div>
+      <div class="dbt-body">
+        <pre><span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'orders'</span>) }}
+<span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span></pre>
+        <div class="what-changed"><strong>What changed:</strong> Now a standalone warehouse table that exists after the run. When another team needs clean orders, they write <code>ref('stg_orders')</code> — not copy-paste this filter logic into their own script. "What is a valid order" lives in one place.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="expand-block" id="b3" onclick="toggle('b3','r3')">
+    <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">clean_payments = raw_payments.loc[amount > 0]</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">In-memory filter</span></div>
+    <div class="code-body"><pre><span class="wl">clean_payments = (raw_payments  <span class="wn">⚡ serial — must wait for previous step</span></span>
+    .loc[raw_payments[<span style="color:#a5d6ff">"amount"</span>] &gt; 0]
+    .rename(columns={<span style="color:#a5d6ff">"amount"</span>: <span style="color:#a5d6ff">"payment_amount"</span>})
+    [[<span style="color:#a5d6ff">"payment_id"</span>, <span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"payment_amount"</span>]])</pre></div>
+    <div class="dbt-reveal" id="r3">
+      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_payments.sql</strong></span></div>
+      <div class="dbt-body">
+        <pre><span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'payments'</span>) }}
+<span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span></pre>
+        <div class="what-changed"><strong>What changed:</strong> <code>stg_customers</code>, <code>stg_orders</code>, and <code>stg_payments</code> all reference only <code>source()</code> — no <code>ref()</code> between them. dbt sees they're independent and runs all three simultaneously. The Python script had no way to do that.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="expand-block" id="b4" onclick="toggle('b4','r4')">
+    <div class="code-head" style="background:rgba(210,153,34,.05)"><span class="lbl" style="color:#d29922">orders_w_pmts = clean_orders.merge(pmt_by_order)</span><span class="badge" style="background:rgba(210,153,34,.14);color:#d29922">In-memory join</span></div>
+    <div class="code-body"><pre><span class="wl">pmt_by_order  = clean_payments.groupby(<span style="color:#a5d6ff">"order_id"</span>, as_index=<span style="color:#ff7b72">False</span>)[<span style="color:#a5d6ff">"payment_amount"</span>].sum()  <span class="wn">⚡ implicit dep</span></span>
+<span class="wl">orders_w_pmts = clean_orders.merge(pmt_by_order, on=<span style="color:#a5d6ff">"order_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)  <span class="wn">⚡ depends on steps 3&amp;4</span></span></pre></div>
+    <div class="dbt-reveal" id="r4">
+      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/intermediate/int_orders_with_payments.sql</strong></span></div>
+      <div class="dbt-body">
+        <pre><span style="color:#ff7b72">SELECT</span>
+    o.order_id, o.customer_id, o.order_date, o.total_amount,
+    <span style="color:#79c0ff">SUM</span>(p.payment_amount) <span style="color:#ff7b72">AS</span> total_paid
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
+<span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_payments'</span>) }} p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
+<span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount</pre>
+        <div class="what-changed"><strong>What changed:</strong> The merge becomes a SQL JOIN that runs in the warehouse. <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code> are dependency declarations — dbt knows to run both staging models first. You didn't write orchestration logic. The <code>ref()</code> calls <em>are</em> the orchestration.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="expand-block" id="b5" onclick="toggle('b5','r5')">
+    <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">summary.to_sql(..., if_exists='replace')</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Data write-back</span></div>
+    <div class="code-body"><pre><span class="il">summary = (clean_customers  <span class="in">⚠ result lives in memory until write</span></span>
+    .merge(orders_w_pmts, on=<span style="color:#a5d6ff">"customer_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)
+    .groupby([<span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"email"</span>], as_index=<span style="color:#ff7b72">False</span>)
+    .agg(lifetime_orders=(<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"count"</span>),
+         lifetime_revenue=(<span style="color:#a5d6ff">"total_amount"</span>, <span style="color:#a5d6ff">"sum"</span>)))
+<span class="il">summary.to_sql(<span style="color:#a5d6ff">"fct_customer_order_summary"</span>, engine, schema=<span style="color:#a5d6ff">"analytics"</span>, if_exists=<span style="color:#a5d6ff">"replace"</span>)  <span class="in">⚠ writes all rows back</span></span></pre></div>
+    <div class="dbt-reveal" id="r5">
+      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/marts/fct_customer_order_summary.sql</strong></span></div>
+      <div class="dbt-body">
+        <pre><span style="color:#8b949e">-- No to_sql(). No data transfer. Materialization is config, not code.</span>
+<span style="color:#ff7b72">SELECT</span>
+    c.customer_id, c.email,
+    <span style="color:#79c0ff">COUNT</span>(op.order_id)                 <span style="color:#ff7b72">AS</span> lifetime_orders,
+    <span style="color:#79c0ff">COALESCE</span>(<span style="color:#79c0ff">SUM</span>(op.total_amount), <span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> lifetime_revenue
+<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_customers'</span>) }} c
+<span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'int_orders_with_payments'</span>) }} op
+    <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
+<span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email</pre>
+        <div class="what-changed"><strong>The pattern:</strong> <code>pd.read_sql()</code> → <code>source()</code>. <code>DataFrame</code> → <code>ref()</code>. <code>to_sql()</code> → gone (dbt handles it). Data stops traveling. Computation moves to where the data lives.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 4: WHAT EMERGES -->
+<div class="section">
+  <p class="section-label">What emerges</p>
+  <p class="prose">The Python script had the same logical structure as these five models — it just kept that structure implicit, strung together as sequential lines of code. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call makes a dependency explicit. dbt reads them and builds the execution graph automatically.</p>
+
+  <div class="dag-wrap" style="padding:16px">
+    <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px">
+      <defs><marker id="ar" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="7" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 3.5 L 0 7 z" fill="#444c56"/></marker></defs>
+      <text x="78" y="22" fill="#444c56" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle" letter-spacing="1">SOURCES</text>
+      <text x="272" y="22" fill="#58a6ff" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle" letter-spacing="1">STAGING</text>
+      <text x="525" y="22" fill="#d29922" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle" letter-spacing="1">INTERMEDIATE</text>
+      <text x="754" y="22" fill="#3fb950" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle" letter-spacing="1">MARTS</text>
+      <line x1="170" y1="30" x2="170" y2="310" stroke="#21262d" stroke-width="1" stroke-dasharray="3,5"/>
+      <line x1="385" y1="30" x2="385" y2="310" stroke="#21262d" stroke-width="1" stroke-dasharray="3,5"/>
+      <line x1="642" y1="30" x2="642" y2="310" stroke="#21262d" stroke-width="1" stroke-dasharray="3,5"/>
+      <path d="M 138 75 L 170 75" stroke="#444c56" stroke-width="1.5" fill="none" marker-end="url(#ar)" opacity=".5"/>
+      <path d="M 138 160 L 170 160" stroke="#444c56" stroke-width="1.5" fill="none" marker-end="url(#ar)" opacity=".5"/>
+      <path d="M 138 245 L 170 245" stroke="#444c56" stroke-width="1.5" fill="none" marker-end="url(#ar)" opacity=".5"/>
+      <path d="M 352 160 C 400 160 405 188 438 192" stroke="#d29922" stroke-width="2" fill="none" marker-end="url(#ar)" opacity=".6"/>
+      <path d="M 352 245 C 400 245 405 208 438 204" stroke="#d29922" stroke-width="2" fill="none" marker-end="url(#ar)" opacity=".6"/>
+      <path d="M 352 75 C 468 75 545 148 688 168" stroke="#3fb950" stroke-width="2" fill="none" marker-end="url(#ar)" opacity=".5"/>
+      <path d="M 610 198 L 688 185" stroke="#3fb950" stroke-width="2" fill="none" marker-end="url(#ar)" opacity=".6"/>
+      <g><rect x="14" y="52" width="124" height="46" rx="6" fill="#1c2129" stroke="#2d333b" stroke-width="1.5"/><text x="76" y="70" fill="#8b949e" font-family="JetBrains Mono,monospace" font-size="9" text-anchor="middle">raw</text><text x="76" y="86" fill="#e6edf3" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" text-anchor="middle">customers</text></g>
+      <g><rect x="14" y="137" width="124" height="46" rx="6" fill="#1c2129" stroke="#2d333b" stroke-width="1.5"/><text x="76" y="155" fill="#8b949e" font-family="JetBrains Mono,monospace" font-size="9" text-anchor="middle">raw</text><text x="76" y="171" fill="#e6edf3" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" text-anchor="middle">orders</text></g>
+      <g><rect x="14" y="222" width="124" height="46" rx="6" fill="#1c2129" stroke="#2d333b" stroke-width="1.5"/><text x="76" y="240" fill="#8b949e" font-family="JetBrains Mono,monospace" font-size="9" text-anchor="middle">raw</text><text x="76" y="256" fill="#e6edf3" font-family="JetBrains Mono,monospace" font-size="10" font-weight="600" text-anchor="middle">payments</text></g>
+      <g><rect x="170" y="52" width="182" height="46" rx="6" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="2"/><text x="261" y="80" fill="#58a6ff" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600" text-anchor="middle">stg_customers</text></g>
+      <g><rect x="170" y="137" width="182" height="46" rx="6" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="2"/><text x="261" y="165" fill="#58a6ff" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600" text-anchor="middle">stg_orders</text></g>
+      <g><rect x="170" y="222" width="182" height="46" rx="6" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="2"/><text x="261" y="250" fill="#58a6ff" font-family="JetBrains Mono,monospace" font-size="11" font-weight="600" text-anchor="middle">stg_payments</text></g>
+      <g><rect x="438" y="178" width="172" height="46" rx="6" fill="rgba(210,153,34,.07)" stroke="#d29922" stroke-width="2"/><text x="524" y="198" fill="#d29922" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle">int_orders</text><text x="524" y="212" fill="#d29922" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle">_with_payments</text></g>
+      <g><rect x="688" y="155" width="158" height="52" rx="6" fill="rgba(63,185,80,.07)" stroke="#3fb950" stroke-width="2"/><text x="767" y="175" fill="#3fb950" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle">fct_customer</text><text x="767" y="190" fill="#3fb950" font-family="JetBrains Mono,monospace" font-size="9" font-weight="600" text-anchor="middle">_order_summary</text></g>
+      <text x="261" y="300" fill="#444c56" font-family="DM Sans,sans-serif" font-size="11" text-anchor="middle" font-style="italic">all run in parallel — in the warehouse</text>
+      <text x="524" y="300" fill="#444c56" font-family="DM Sans,sans-serif" font-size="11" text-anchor="middle" font-style="italic">waits for stg_orders + stg_payments</text>
+    </svg>
+  </div>
+  <p class="caption">The Python script had this same dependency graph. It just wasn't visible — or parallel.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 5: SCALE -->
+<div class="section">
+  <p class="section-label">The consequence</p>
+  <p class="prose">The architectural difference compounds at scale. A Python pipeline's ceiling is your machine's memory. A dbt pipeline's ceiling is your warehouse — which you can resize without touching the code.</p>
+
+  <div class="scale-wrap" style="margin-top:24px">
+    <div class="scale-block">
+      <h4>❌ python pipeline — compute on machine</h4>
+      <div class="scale-row"><span class="scale-label">100 MB dataset</span><span class="scale-val" style="color:#3fb950">works fine</span></div>
+      <div class="scale-row"><span class="scale-label">10 GB dataset</span><span class="scale-val" style="color:#d29922">slow, chunking needed</span></div>
+      <div class="scale-row"><span class="scale-label">1 TB dataset</span><span class="scale-val" style="color:#f85149">OOM — rewrite required</span></div>
+      <div class="scale-row"><span class="scale-label">intermediate state</span><span class="scale-val" style="color:#f85149">gone on crash</span></div>
+      <div class="scale-row"><span class="scale-label">parallel steps</span><span class="scale-val" style="color:#f85149">manual threading</span></div>
+      <div class="scale-row"><span class="scale-label">debug intermediate</span><span class="scale-val" style="color:#f85149">re-run + print()</span></div>
+    </div>
+    <div class="scale-block">
+      <h4>✅ dbt — compute in warehouse</h4>
+      <div class="scale-row"><span class="scale-label">100 MB dataset</span><span class="scale-val" style="color:#3fb950">works fine</span></div>
+      <div class="scale-row"><span class="scale-label">10 GB dataset</span><span class="scale-val" style="color:#3fb950">same code</span></div>
+      <div class="scale-row"><span class="scale-label">1 TB dataset</span><span class="scale-val" style="color:#3fb950">resize warehouse, same code</span></div>
+      <div class="scale-row"><span class="scale-label">intermediate state</span><span class="scale-val" style="color:#3fb950">persists as tables</span></div>
+      <div class="scale-row"><span class="scale-label">parallel steps</span><span class="scale-val" style="color:#3fb950">automatic from ref()</span></div>
+      <div class="scale-row"><span class="scale-label">debug intermediate</span><span class="scale-val" style="color:#3fb950">SELECT * FROM stg_orders</span></div>
+    </div>
+  </div>
+  <p class="caption">The code change between 100MB and 1TB: zero. The infrastructure change: warehouse size. That's the tradeoff.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 6: WHEN IT BREAKS -->
+<div class="section">
+  <p class="section-label">When it breaks</p>
+  <p class="prose">The design philosophy becomes concrete in the failure case. Click each scenario.</p>
+
+  <div style="margin-top:24px">
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline OOMs on a larger dataset</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">python pipeline</div><p>MemoryError on the <code>merge()</code>. The DataFrame that caused it is gone. Re-run with a smaller sample to see what was in it, or rewrite with chunking. Data engineering work has now interrupted analytics work.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>The query runs in the warehouse. There's no local memory ceiling. If the warehouse runs out of resources, you resize it — or investigate the query plan. The code doesn't change.</p></div>
+        </div>
+        <div class="scenario-note"><strong>The difference:</strong> one architecture has a hard ceiling at your machine's RAM. The other scales with infrastructure you can adjust without touching code.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Wrong row count in the final output</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">python pipeline</div><p>Add <code>print(len(df))</code> after each step, re-run the full script to capture intermediate counts. Multiple debug cycles before you find the fan-out point.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code> — how many rows? Query <code>int_orders_with_payments</code> — how many? The difference shows exactly where the problem is. No re-run needed.</p></div>
+        </div>
+        <div class="scenario-note">Bisect a data problem the same way you'd bisect a software bug — without re-running anything.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline crashes mid-run</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">python pipeline</div><p>All DataFrames gone. The state from steps 1–4 died with the process. Re-run from the top — same data transfers, same compute time — to reproduce the failure.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>Every completed model is still in the warehouse as a real table. Run <code>dbt run -s failed_model+</code> to re-execute only what failed and its downstream dependencies.</p></div>
+        </div>
+        <div class="scenario-note"><strong>The difference:</strong> in-memory state vanishes on crash. Warehouse tables persist. That changes whether you restart from zero or from where you left off.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Another team wants to reuse your clean orders logic</span><span class="chevron">▼</span></div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc"><div class="ch">python pipeline</div><p>They copy the filter logic into their own script. Now you have two definitions of "valid order." When one gets updated, the other silently drifts. This is how data definitions diverge.</p></div>
+          <div class="dc"><div class="ch">dbt</div><p>They write <code>ref('stg_orders')</code>. They're now building on your model — same table, same definition, updated automatically when you change it. One source of truth.</p></div>
+        </div>
+        <div class="scenario-note">The real value of <code>ref()</code> isn't dependency tracking. It's that the same table gets reused instead of redefined.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 7: THE POINT -->
+<div class="section">
+  <p class="section-label">The point</p>
+  <p class="conclusion">Python or SQL is the wrong question.</p>
+  <p class="conclusion">The question is: where does your computation run? On your machine — with your machine's memory as the ceiling, data traveling back and forth, intermediate state that vanishes on failure — or in the warehouse, where the data already lives, at the scale the warehouse provides?</p>
+  <p class="prose">For genuinely complex transformations — ML models, arbitrary iteration, operations that require Python libraries — the answer might be "on a machine." Use Python for those.</p>
+  <p class="prose" style="margin-top:16px">For everything that can be expressed as a set operation — which is most of what data transformation actually is — the answer is almost always "in the warehouse." Use SQL for those. Not because SQL is better, but because running compute where the data lives is a simpler architecture.</p>
+  <div class="pull" style="margin-top:28px">
+    The migration from a Python pipeline to dbt isn't a rewrite. It's a relocation.<br>
+    The logic moves from your machine to the warehouse. Everything else — scale, parallelism, intermediate persistence — follows from that one change.<br>
+    <em>That's what the migration is actually about. The Python vs SQL debate is almost beside the point.</em>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="post-footer">
+  <a href="../../" class="footer-back">← dbt perspectives</a>
+  <div class="footer-gh"><a href="https://github.com/cedricturner/dbt-perspectives" target="_blank" rel="noopener noreferrer"><svg height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>view source</a></div>
+</div>
+
+</div>
+<script>
+function toggle(bid,rid){
+  var b=document.getElementById(bid),r=document.getElementById(rid);
+  var open=r.classList.contains('show');
+  r.classList.toggle('show',!open);
+  b.classList.toggle('open',!open);
+}
+function toggleScenario(t){
+  var b=t.nextElementSibling,open=b.classList.contains('show');
+  b.classList.toggle('show',!open);
+  t.classList.toggle('open',!open);
+}
+</script>
+</body>
+</html>
