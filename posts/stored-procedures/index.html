@@ -123,15 +123,15 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Data Modeling</div>
   <h1>The stored procedure<br>is not your enemy</h1>
-  <p class="lede">The real issue isn't the stored procedure. It's that the whole thing was built to run — not to be looked inside. That matters a lot more than cleaning up the code.</p>
+  <p class="lede">The real issue isn't the stored procedure. It's that the whole thing was built to run, not to be looked inside. That matters a lot more than cleaning up the code.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">Stored procedures work. That's the thing. Most teams have been running them for years without serious issues. The pipeline runs every night, the data lands, dashboards update. The standard argument for moving away is usually about the code — it's messy, not in version control, hard to test.</p>
+  <p class="prose">Stored procedures work. That's the thing. Most teams have been running them for years without serious issues. The pipeline runs every night, the data lands, dashboards update. The standard argument for moving away is usually about the code. It's messy, not in version control, hard to test.</p>
   <p class="prose">All of that's true. But it frames the problem as a code cleanliness thing. Like if you just reorganized the logic and added some Git commits, you'd be fine.</p>
-  <p class="prose">There's another dimension to it. If you were leaving a list of chores for someone, you'd write <em>do the dishes</em> and <em>do the laundry</em> — not a 50-step breakdown of every micro-action involved. The high-level tasks are readable. Someone new can follow them. But hand them a dense multi-page list that breaks every action down to its individual components — and then multiply that across a large house, or a whole maid service running dozens of houses — and the overhead of understanding what's happening swamps the actual work. That's what a stored procedure ends up feeling like at scale. Not just messy code. A wall of sequential instructions where you have to read all of it before any of it makes sense.</p>
+  <p class="prose">There's another dimension to it. If you were leaving a list of chores for someone, you'd write <em>do the dishes</em> and <em>do the laundry</em>. Not a 50-step breakdown of every micro-action involved. The high-level tasks are readable. Someone new can follow them. But hand them a dense multi-page list that breaks every action down to its individual components, and then multiply that across a large house, or a whole maid service running dozens of houses. The overhead of understanding what's happening swamps the actual work. That's what a stored procedure ends up feeling like at scale. Not just messy code. A wall of sequential instructions where you have to read all of it before any of it makes sense.</p>
   <p class="prose">The actual problem is different. It's not in the code at all.</p>
 </div>
 
@@ -140,7 +140,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2: TENSION -->
 <div class="section">
   <p class="section-label">The tension</p>
-  <p class="prose">The real problem shows up when something breaks. More specifically — what happens right after it breaks.</p>
+  <p class="prose">The real problem shows up when something breaks. More specifically: what happens right after it breaks.</p>
   <p class="prose">A stored procedure creates temp tables, runs data through a series of steps, produces a final output, and ends. When the session ends, those temp tables disappear. They're gone. If step 4 fails, steps 1, 2, and 3 died with it. There's nothing left to look at. To debug, you start the whole thing over from the top.</p>
   <p class="prose" style="margin-top:16px">Think about household chores. You're doing laundry, dishes, vacuuming, and cooking. You open the dryer at the end and your clothes are still damp. You wouldn't respond by going back to recook dinner, rewash the dishes, and revacuum. A problem in one place doesn't erase everything else. But that's exactly what a stored procedure forces you to do. The session ends, the temp tables vanish, and a failure at step 4 wipes out steps 1, 2, and 3 right along with it. Every debug attempt is a full restart.</p>
 
@@ -175,7 +175,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <text x="256" y="167" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10.5" fill="#f85149" opacity=".7" font-style="italic">↺ restart everything from scratch</text>
   </svg>
   </div>
-  <p class="caption" style="margin-bottom:0">One failure wipes out every completed step — even the ones that worked fine.</p>
+  <p class="caption" style="margin-bottom:0">One failure wipes out every completed step, including the ones that worked fine.</p>
 
   <div class="code-wrap" style="border-color:#f85149;margin-top:28px">
     <div class="code-head" style="background:rgba(248,81,73,.05)">
@@ -216,10 +216,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">END</span>; $$ <span style="color:#ff7b72">LANGUAGE</span> plpgsql;</pre>
     </div>
   </div>
-  <p class="caption">One file. Five steps. When it finishes — or when it fails — there's nothing left.</p>
+  <p class="caption">One file. Five steps. Whether it succeeds or fails, there's nothing left.</p>
 
   <div class="pull" style="margin-top:28px">
-    This isn't bad code. It does exactly what it was built to do — run a transformation and produce an output. The problem is that's all it was ever designed to do. Nobody built it to be inspected. So when it breaks, you're starting from scratch.
+    This isn't bad code. It does exactly what it was built to do: run a transformation and produce an output. The problem is that's all it was ever designed to do. Nobody built it to be inspected. So when it breaks, you're starting from scratch.
   </div>
 </div>
 
@@ -249,7 +249,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <span style="color:#79c0ff">COALESCE</span>(first_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
     <span style="color:#79c0ff">COALESCE</span>(last_name,  <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'customers'</span>) }}</pre>
-        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. The only things that moved are the wrapper and the reference. No more <code>CREATE TEMP TABLE</code> — dbt handles materialization separately. And <code>raw.customers</code> becomes <code>source('raw','customers')</code>, which tells dbt this is an external entry point it can track and test. The result is a real table in your warehouse — not session-scoped. It's there after the run finishes, whether it succeeded or not.</div>
+        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. The only things that moved are the wrapper and the reference. No more <code>CREATE TEMP TABLE</code>. dbt handles materialization separately. And <code>raw.customers</code> becomes <code>source('raw','customers')</code>, which tells dbt this is an external entry point it can track and test. The result is a real table in your warehouse, not session-scoped. It's there after the run finishes, whether it succeeded or not.</div>
       </div>
     </div>
   </div>
@@ -375,7 +375,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 5: PARALLELISM -->
 <div class="section">
   <p class="section-label">The consequence</p>
-  <p class="prose">Once the dependencies are explicit, dbt knows which models don't depend on each other. So it runs them at the same time. The stored procedure couldn't do that — it ran everything in order, one step after another, because there was no other option.</p>
+  <p class="prose">Once the dependencies are explicit, dbt knows which models don't depend on each other. So it runs them at the same time. The stored procedure couldn't do that. It ran everything in order, one step after another, because there was no other option.</p>
   <p class="prose" style="margin-top:16px">Think of it like chores. You wouldn't start the washing machine, wait for it to finish, move the clothes to the dryer, wait for that to finish, and only then start cooking — then do the dishes after you're done eating. Some of those things are related (the dryer waits on the washer), but most aren't. You'd run the independent ones in parallel. That's exactly what the lineage makes visible. dbt sees which models need to wait for each other and which don't. The ones that don't, start at the same time.</p>
 
   <div class="dag-wrap" style="padding:16px 20px;margin-top:20px;margin-bottom:4px">
@@ -407,11 +407,11 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <text x="177" y="162" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d29922" font-weight="600">dishes</text>
   </svg>
   </div>
-  <p class="caption" style="margin-bottom:0">The dryer waits on the washer — but nothing about cooking waits on laundry. Both chains run at the same time.</p>
+  <p class="caption" style="margin-bottom:0">The dryer waits on the washer, but nothing about cooking waits on laundry. Both chains run at the same time.</p>
 
   <div class="par-wrap" style="margin-top:24px">
     <div class="par-block">
-      <h4>❌ stored procedure — serial only</h4>
+      <h4>❌ stored procedure: serial only</h4>
       <div class="bar-row"><span class="bar-lbl">step 1</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#58a6ff;left:0%">stg_cust</div></div></div>
       <div class="bar-row"><span class="bar-lbl">step 2</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#3fb950;left:20%">stg_orders</div></div></div>
       <div class="bar-row"><span class="bar-lbl">step 3</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#d29922;left:40%">stg_pay</div></div></div>
@@ -420,7 +420,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <p class="par-note">Total time: <strong style="color:#f85149">5 units</strong></p>
     </div>
     <div class="par-block">
-      <h4>✅ dbt — parallel across threads</h4>
+      <h4>✅ dbt: parallel across threads</h4>
       <div class="bar-row"><span class="bar-lbl">thread 1</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#58a6ff;left:0%">stg_cust</div></div></div>
       <div class="bar-row"><span class="bar-lbl">thread 2</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#3fb950;left:0%">stg_orders</div></div></div>
       <div class="bar-row"><span class="bar-lbl">thread 3</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#d29922;left:0%">stg_pay</div></div></div>
@@ -429,7 +429,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <p class="par-note">Total time: <strong style="color:#3fb950">3 units</strong></p>
     </div>
   </div>
-  <p class="caption">At real scale — hundreds of models — this compounds. A batch of 40 independent staging models runs in roughly the time it takes to run one.</p>
+  <p class="caption">At real scale (hundreds of models), this compounds. A batch of 40 independent staging models runs in roughly the time it takes to run one.</p>
 </div>
 
 <div class="sep"></div>
@@ -463,7 +463,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </div>
 
     <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Upstream schema change — a column renamed</span><span class="chevron">▼</span></div>
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Upstream schema change: a column renamed</span><span class="chevron">▼</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
           <div class="dc"><div class="ch">stored procedure</div><p>The proc fails or silently returns NULLs. You trace back through the file to figure out which temp table got hit. Then you hope nothing downstream was depending on it.</p></div>
@@ -491,10 +491,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 7: BEFORE IT BREAKS -->
 <div class="section">
   <p class="section-label">Before it breaks</p>
-  <p class="prose">All the scenarios above start the same way: someone discovers a problem after the fact. A dashboard is broken. The row count is off. An alert fires at 3am. That's the equivalent of opening the dryer and finding your clothes still wet — you only know because you went to use the output.</p>
-  <p class="prose" style="margin-top:16px">Alerting is like a dryer with a sensor that tells you there's an issue before you even start the cycle. You never end up with wet clothes, because the system caught the problem upstream. If you need to rush out the door, you find out in time to do something about it — not when you're already late.</p>
-  <p class="prose" style="margin-top:16px">Most data workflows don't have testing built in. So problems surface downstream, at the wrong time, in ways that affect real decisions. You come home hungry and don't know the refrigerator broke — so you spend money on takeout, and <em>then</em> discover you also have to fix the fridge. Two problems instead of one, because the first one wasn't visible when it would have been cheapest to catch.</p>
-  <p class="prose" style="margin-top:16px">dbt tests are that earlier detection point. A freshness check, a not-null assertion, a referential integrity test — these run before the data reaches the dashboard. If something upstream is wrong, it surfaces at the source, not in the numbers your stakeholders are using to make decisions.</p>
+  <p class="prose">All the scenarios above start the same way: someone discovers a problem after the fact. A dashboard is broken. The row count is off. An alert fires at 3am. That's the equivalent of opening the dryer and finding your clothes still wet. You only know because you went to use the output.</p>
+  <p class="prose" style="margin-top:16px">Alerting is like a dryer with a sensor that tells you there's an issue before you even start the cycle. You never end up with wet clothes, because the system caught the problem upstream. If you need to rush out the door, you find out in time to do something about it, not when you're already late.</p>
+  <p class="prose" style="margin-top:16px">Most data workflows don't have testing built in. So problems surface downstream, at the wrong time, in ways that affect real decisions. You come home hungry and don't know the refrigerator broke, so you spend money on takeout, and <em>then</em> discover you also have to fix the fridge. Two problems instead of one, because the first one wasn't visible when it would have been cheapest to catch.</p>
+  <p class="prose" style="margin-top:16px">dbt tests are that earlier detection point. A freshness check, a not-null assertion, a referential integrity test. These run before the data reaches the dashboard. If something upstream is wrong, it surfaces at the source, not in the numbers your stakeholders are using to make decisions.</p>
 
   <div class="dag-wrap" style="padding:0;overflow:hidden;margin-top:24px;margin-bottom:4px">
   <svg viewBox="0 0 520 222" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:380px">
@@ -538,10 +538,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <text x="254" y="178" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#3fb950" font-weight="600">handled early</text>
   </svg>
   </div>
-  <p class="caption" style="margin-bottom:0">One broken fridge cascades into five problems without visibility. Tests catch it at the source — before anything downstream is affected.</p>
+  <p class="caption" style="margin-bottom:0">One broken fridge cascades into five problems without visibility. Tests catch it at the source, before anything downstream is affected.</p>
 
   <div class="pull" style="margin-top:28px">
-    A broken dashboard and wet laundry are the same thing: discovery after the fact. Tests move the detection point upstream — before the run completes, before the stakeholder sees the output, before the problem compounds into something more expensive to fix.
+    A broken dashboard and wet laundry are the same thing: discovery after the fact. Tests move the detection point upstream: before the run completes, before the stakeholder sees the output, before the problem compounds into something more expensive to fix.
   </div>
 </div>
 
@@ -552,11 +552,11 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <p class="section-label">The point</p>
   <p class="conclusion">The stored procedure is not your enemy.</p>
   <p class="conclusion">The invisible pipeline is. The one that runs and disappears. The one that leaves you nothing to look at when something goes wrong. Debugging it means starting over every time, because nothing survived.</p>
-  <p class="prose">dbt fixes that not by being a better query runner — the SQL is basically the same. It fixes it by making every step a real table that sticks around. The pipeline runs. The tables survive. When something breaks, you start from evidence, not from memory.</p>
+  <p class="prose">dbt fixes that not by being a better query runner. The SQL is basically the same. It fixes it by making every step a real table that sticks around. The pipeline runs. The tables survive. When something breaks, you start from evidence, not from memory.</p>
   <p class="prose" style="margin-top:16px">When you're evaluating any data pipeline, there's one question worth asking: <em>what does it leave behind when it runs?</em></p>
   <div class="pull" style="margin-top:28px">
-    If the answer is just the final output — you're one failure away from starting from scratch.<br>
-    If the answer is every intermediate step as a real table you can query — you're debugging from evidence.<br>
+    If the answer is just the final output: you're one failure away from starting from scratch.<br>
+    If the answer is every intermediate step as a real table you can query: you're debugging from evidence.<br>
     <em>That's what the migration is actually about. The SQL is almost beside the point.</em>
   </div>
 </div>
