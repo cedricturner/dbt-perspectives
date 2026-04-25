@@ -225,7 +225,22 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <div class="sep"></div>
 
-<!-- SECTION 3: THE SHIFT -->
+<!-- SECTION 3: THE OBVIOUS FIX -->
+<div class="section">
+  <p class="section-label">The obvious fix</p>
+  <p class="prose">The natural response is: just break it into multiple stored procedures. Chain them together. Each one writes a real table. Now you have intermediate state that survives.</p>
+  <p class="prose" style="margin-top:16px">That does solve the persistence problem. It's genuinely better. But it leaves the harder problems untouched.</p>
+  <p class="prose" style="margin-top:16px">Think about dividing chores among housemates. Person 1 does laundry, Person 2 folds, Person 3 cooks, Person 4 does dishes. Each person finishes their job and leaves the result. That's an improvement over one person doing everything in one uninterruptible session. But someone still has to text the group chat: "Person 2, don't start folding until Person 1 is done with the washer." That coordination — the order, the dependencies — lives in the group chat. Not in the work. If the group chat is wrong, things run out of order. If someone new joins the house, they have to read the entire chat history to understand what runs when and why.</p>
+  <p class="prose" style="margin-top:16px">With chained stored procedures, that group chat is an orchestration script. The dependencies between procedures live outside the code, in a separate system that has to be kept in sync manually. If you add a new procedure, you update the script. If the script breaks, things run in the wrong order. Nobody looking at any individual procedure can tell what it depends on or what depends on it.</p>
+  <p class="prose" style="margin-top:16px">There's also still no shared definition. If two teams both need clean orders data, they each write their own procedure. Over time the logic drifts. And there's still no testing — each procedure assumes the previous one's output was correct.</p>
+  <div class="pull" style="margin-top:28px">
+    With dbt, the folding task itself says "I need the washer to finish before I start" — that's what <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> does. The dependency is declared in the code. There's no group chat to maintain, no orchestration script to keep in sync. The order emerges from the work itself.
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 4: THE SHIFT -->
 <div class="section">
   <p class="section-label">What actually changes</p>
   <p class="prose">The SQL barely changes. That's not really what dbt does. What changes is what's still there after the pipeline finishes running.</p>
