@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The stored procedure is not your enemy — dbt perspectives</title>
+<title>The script is not your enemy — dbt perspectives</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -50,13 +50,25 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .in{color:#f85149;font-size:10px;font-style:italic}
 .wn{color:#d29922;font-size:10px;font-style:italic}
 
+/* Script type tabs */
+.script-switcher{margin-bottom:0}
+.script-switcher-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#444c56;margin-bottom:10px}
+.script-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.script-tab{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:6px 14px;border-radius:6px 6px 0 0;cursor:pointer;border:1px solid #2d333b;border-bottom:none;background:#161b22;color:#8b949e;transition:all .15s;user-select:none;margin-bottom:-1px;position:relative}
+.script-tab:hover{color:#e6edf3;background:#1c2129}
+.script-tab.active{background:#0d1117;color:#ff6b35;border-color:#ff6b35;z-index:1}
+.script-panel{display:none}
+.script-panel.active{display:block}
+.script-wrap{border:1px solid #2d333b;border-radius:0 6px 6px 6px;overflow:hidden;background:#0d1117}
+.script-wrap .code-wrap{border-radius:0;border:none;margin-bottom:0}
+
 /* Click-to-expand blocks */
 .expand-block{cursor:pointer;border:2px solid #2d333b;border-radius:9px;overflow:hidden;margin-bottom:10px;transition:border-color .2s}
-.expand-block .code-head::after{content:'click to see in dbt →';font-family:'DM Sans',sans-serif;font-size:10px;color:#58a6ff;opacity:.6;font-weight:500}
+.expand-block .code-head::after{content:'click to see in dbt \2192';font-family:'DM Sans',sans-serif;font-size:10px;color:#58a6ff;opacity:.6;font-weight:500}
 .expand-block:hover{border-color:#58a6ff}
 .expand-block:hover .code-head::after{opacity:1}
 .expand-block.open{border-color:#3fb950}
-.expand-block.open .code-head::after{content:'▲ collapse';opacity:.5}
+.expand-block.open .code-head::after{content:'\25b2 collapse';opacity:.5}
 .dbt-reveal{display:none;border-top:1px solid #2d333b}
 .dbt-reveal.show{display:block}
 .dbt-arrow{display:flex;align-items:center;gap:9px;padding:9px 17px;background:#0a120a;border-bottom:1px dashed #2d333b}
@@ -111,28 +123,28 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
 .footer-gh a:hover{color:#8b949e}
 
-@media(max-width:580px){.par-wrap{grid-template-columns:1fr}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
+@media(max-width:580px){.par-wrap{grid-template-columns:1fr}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}.script-tab{font-size:9px;padding:5px 10px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-<a href="../../" class="back">← dbt perspectives</a>
+<a href="../../" class="back">&larr; dbt perspectives</a>
 
 <!-- HERO -->
 <div class="hero">
   <div class="hero-tag">Data Modeling</div>
-  <h1>The stored procedure<br>is not your enemy</h1>
-  <p class="lede">The real issue isn't the stored procedure. It's that the whole thing was built to run, not to be looked inside. That matters a lot more than cleaning up the code.</p>
+  <h1>The script is not<br>your enemy</h1>
+  <p class="lede">It doesn&rsquo;t matter if it&rsquo;s a stored procedure, a pandas pipeline, or a DAG full of Python operators. The real problem is the same across all of them: the whole thing was built to run, not to be looked inside.</p>
 </div>
 
 <!-- SECTION 1: INTUITION -->
 <div class="section">
   <p class="section-label">What people think</p>
-  <p class="prose">Stored procedures work. That's the thing. Most teams have been running them for years without serious issues. The pipeline runs every night, the data lands, dashboards update. The standard argument for moving away is usually about the code. It's messy, not in version control, hard to test.</p>
-  <p class="prose">All of that's true. But it frames the problem as a code cleanliness thing. Like if you just reorganized the logic and added some Git commits, you'd be fine.</p>
-  <p class="prose">There's another dimension to it. If you were leaving a list of chores for someone, you'd write <em>do the dishes</em> and <em>do the laundry</em>. Not a 50-step breakdown of every micro-action involved. The high-level tasks are readable. Someone new can follow them. But hand them a dense multi-page list that breaks every action down to its individual components, and then multiply that across a large house, or a whole maid service running dozens of houses. The overhead of understanding what's happening swamps the actual work. That's what a stored procedure ends up feeling like at scale. Not just messy code. A wall of sequential instructions where you have to read all of it before any of it makes sense.</p>
-  <p class="prose">The actual problem is different. It's not in the code at all.</p>
+  <p class="prose">Scripts work. That&rsquo;s the thing. Most teams have been running them for years without serious issues. The pipeline runs every night, the data lands, dashboards update. The standard argument for moving away is usually about the code. It&rsquo;s messy, not in version control, hard to test.</p>
+  <p class="prose">All of that&rsquo;s true. But it frames the problem as a code cleanliness thing. Like if you just reorganized the logic and added some Git commits, you&rsquo;d be fine.</p>
+  <p class="prose">There&rsquo;s another dimension to it. If you were leaving a list of chores for someone, you&rsquo;d write <em>do the dishes</em> and <em>do the laundry</em>. Not a 50-step breakdown of every micro-action involved. The high-level tasks are readable. Someone new can follow them. But hand them a dense multi-page list that breaks every action down to its individual components, and then multiply that across a large house, or a whole maid service running dozens of houses. The overhead of understanding what&rsquo;s happening swamps the actual work. That&rsquo;s what a script ends up feeling like at scale. Not just messy code. A wall of sequential instructions where you have to read all of it before any of it makes sense.</p>
+  <p class="prose">The actual problem is different. It&rsquo;s not in the code at all.</p>
 </div>
 
 <div class="sep"></div>
@@ -141,8 +153,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="section">
   <p class="section-label">The tension</p>
   <p class="prose">The real problem shows up when something breaks. More specifically: what happens right after it breaks.</p>
-  <p class="prose">A stored procedure creates temp tables, runs data through a series of steps, produces a final output, and ends. When the session ends, those temp tables disappear. They're gone. If step 4 fails, steps 1, 2, and 3 died with it. There's nothing left to look at. To debug, you start the whole thing over from the top.</p>
-  <p class="prose" style="margin-top:16px">Think about household chores. You're doing laundry, dishes, vacuuming, and cooking. You open the dryer at the end and your clothes are still damp. You wouldn't respond by going back to recook dinner, rewash the dishes, and revacuum. A problem in one place doesn't erase everything else. But that's exactly what a stored procedure forces you to do. The session ends, the temp tables vanish, and a failure at step 4 wipes out steps 1, 2, and 3 right along with it. Every debug attempt is a full restart.</p>
+  <p class="prose">Whatever form your script takes &mdash; SQL procedure, Python file, DAG &mdash; it runs a series of steps, produces a final output, and ends. The intermediate state lives only as long as the process does. When the session ends or the process crashes, it&rsquo;s gone. There&rsquo;s nothing left to look at. To debug, you start the whole thing over from the top.</p>
+  <p class="prose" style="margin-top:16px">Think about household chores. You&rsquo;re doing laundry, dishes, vacuuming, and cooking. You open the dryer at the end and your clothes are still damp. You wouldn&rsquo;t respond by going back to recook dinner, rewash the dishes, and revacuum. A problem in one place doesn&rsquo;t erase everything else. But that&rsquo;s exactly what a script forces you to do. The process ends, the intermediate state vanishes, and a failure at step 4 wipes out steps 1, 2, and 3 right along with it. Every debug attempt is a full restart.</p>
 
   <div class="dag-wrap" style="padding:16px 20px 20px;margin-top:20px;margin-bottom:4px">
   <svg viewBox="0 0 560 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:400px">
@@ -151,75 +163,211 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <marker id="ar-ch1r" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="7" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 3.5 L 0 7 z" fill="#f85149"/></marker>
     </defs>
     <rect x="28" y="41" width="96" height="58" rx="7" fill="rgba(63,185,80,.07)" stroke="#3fb950" stroke-width="1.5"/>
-    <text x="76" y="64" text-anchor="middle" font-size="20">🧺</text>
+    <text x="76" y="64" text-anchor="middle" font-size="20">&#x1F9FA;</text>
     <text x="76" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="600">laundry</text>
-    <text x="76" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">✓ done</text>
+    <text x="76" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">&#x2713; done</text>
     <line x1="126" y1="70" x2="146" y2="70" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch1)"/>
     <rect x="148" y="41" width="96" height="58" rx="7" fill="rgba(63,185,80,.07)" stroke="#3fb950" stroke-width="1.5"/>
-    <text x="196" y="64" text-anchor="middle" font-size="20">🍽️</text>
+    <text x="196" y="64" text-anchor="middle" font-size="20">&#x1F37D;&#xFE0F;</text>
     <text x="196" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="600">dishes</text>
-    <text x="196" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">✓ done</text>
+    <text x="196" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">&#x2713; done</text>
     <line x1="246" y1="70" x2="266" y2="70" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch1)"/>
     <rect x="268" y="41" width="96" height="58" rx="7" fill="rgba(63,185,80,.07)" stroke="#3fb950" stroke-width="1.5"/>
-    <text x="316" y="64" text-anchor="middle" font-size="20">🧹</text>
+    <text x="316" y="64" text-anchor="middle" font-size="20">&#x1F9F9;</text>
     <text x="316" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="600">vacuum</text>
-    <text x="316" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">✓ done</text>
+    <text x="316" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#3fb950" opacity=".8">&#x2713; done</text>
     <line x1="366" y1="70" x2="386" y2="70" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch1)"/>
     <rect x="388" y="41" width="96" height="58" rx="7" fill="rgba(248,81,73,.08)" stroke="#f85149" stroke-width="2"/>
-    <text x="436" y="64" text-anchor="middle" font-size="20">🍳</text>
+    <text x="436" y="64" text-anchor="middle" font-size="20">&#x1F373;</text>
     <text x="436" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f85149" font-weight="600">cook</text>
-    <text x="436" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#f85149">✗ failed</text>
+    <text x="436" y="94" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#f85149">&#x2717; failed</text>
     <circle cx="480" cy="41" r="11" fill="#f85149"/>
-    <text x="480" y="46" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" fill="white" font-weight="700">✕</text>
+    <text x="480" y="46" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" fill="white" font-weight="700">&#x2715;</text>
     <path d="M 436 99 L 436 148 L 76 148 L 76 101" stroke="#f85149" stroke-width="1.5" fill="none" stroke-dasharray="5,3" marker-end="url(#ar-ch1r)" opacity=".75"/>
-    <text x="256" y="167" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10.5" fill="#f85149" opacity=".7" font-style="italic">↺ restart everything from scratch</text>
+    <text x="256" y="167" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10.5" fill="#f85149" opacity=".7" font-style="italic">&#x21BA; restart everything from scratch</text>
   </svg>
   </div>
   <p class="caption" style="margin-bottom:0">One failure wipes out every completed step, including the ones that worked fine.</p>
 
-  <div class="code-wrap" style="border-color:#f85149;margin-top:28px">
-    <div class="code-head" style="background:rgba(248,81,73,.05)">
-      <span class="lbl" style="color:#f85149">build_customer_order_summary — stored procedure</span>
-      <span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">1 file · 5 steps</span>
+  <!-- SCRIPT TYPE SWITCHER -->
+  <div class="script-switcher" style="margin-top:32px">
+    <p class="script-switcher-label">pick your situation</p>
+    <div class="script-tabs">
+      <div class="script-tab active" onclick="switchTab('sql')">Stored Procedure</div>
+      <div class="script-tab" onclick="switchTab('python')">Python Script</div>
+      <div class="script-tab" onclick="switchTab('airflow')">Airflow DAG</div>
     </div>
-    <div class="code-body"><pre><span style="color:#ff7b72">CREATE OR REPLACE PROCEDURE</span> build_customer_order_summary()
+    <div class="script-wrap">
+
+      <!-- TAB: STORED PROCEDURE -->
+      <div class="script-panel active" id="panel-sql">
+        <div class="code-wrap" style="border-color:#f85149">
+          <div class="code-head" style="background:rgba(248,81,73,.05)">
+            <span class="lbl" style="color:#f85149">build_customer_order_summary &mdash; stored procedure</span>
+            <span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">1 file &middot; 5 steps</span>
+          </div>
+          <div class="code-body"><pre><span style="color:#ff7b72">CREATE OR REPLACE PROCEDURE</span> build_customer_order_summary()
 <span style="color:#ff7b72">AS</span> $$ <span style="color:#ff7b72">BEGIN</span>
 
-  <span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_customers <span style="color:#ff7b72">AS</span>  <span class="in">⚠ temp — gone when session ends</span></span>
-    <span style="color:#ff7b72">SELECT</span> customer_id, <span style="color:#79c0ff">TRIM</span>(<span style="color:#79c0ff">LOWER</span>(email)) <span style="color:#ff7b72">AS</span> email,
-           <span style="color:#79c0ff">COALESCE</span>(first_name,<span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
-           <span style="color:#79c0ff">COALESCE</span>(last_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
-  <span class="il">  <span style="color:#ff7b72">FROM</span> raw.customers;  <span class="in">⚠ hardcoded schema — rename breaks silently</span></span>
+<span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_customers <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; temp &mdash; gone when session ends</span></span>
+  <span style="color:#ff7b72">SELECT</span> customer_id, <span style="color:#79c0ff">TRIM</span>(<span style="color:#79c0ff">LOWER</span>(email)) <span style="color:#ff7b72">AS</span> email,
+         <span style="color:#79c0ff">COALESCE</span>(first_name,<span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
+         <span style="color:#79c0ff">COALESCE</span>(last_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.customers;  <span class="in">&#x26A0; hardcoded schema &mdash; rename breaks silently</span></span>
 
-  <span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_orders <span style="color:#ff7b72">AS</span>  <span class="in">⚠ temp — same problem</span></span>
-    <span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
-  <span class="il">  <span style="color:#ff7b72">FROM</span> raw.orders <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span>;  <span class="in">⚠ hardcoded schema</span></span>
+<span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_orders <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; temp &mdash; same problem</span></span>
+  <span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.orders <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span>;  <span class="in">&#x26A0; hardcoded schema</span></span>
 
-  <span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_payments <span style="color:#ff7b72">AS</span>  <span class="in">⚠ temp — same problem</span></span>
-    <span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
-  <span class="il">  <span style="color:#ff7b72">FROM</span> raw.payments <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span>;  <span class="in">⚠ hardcoded schema</span></span>
+<span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_payments <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; temp &mdash; same problem</span></span>
+  <span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.payments <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span>;  <span class="in">&#x26A0; hardcoded schema</span></span>
 
-  <span class="wl">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_orders_with_payments <span style="color:#ff7b72">AS</span>  <span class="wn">⚡ must wait for steps 2 &amp; 3 — serial only</span></span>
-    <span style="color:#ff7b72">SELECT</span> o.*, <span style="color:#79c0ff">SUM</span>(p.payment_amount) <span style="color:#ff7b72">AS</span> total_paid
-    <span style="color:#ff7b72">FROM</span> tmp_orders o <span style="color:#ff7b72">LEFT JOIN</span> tmp_payments p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
-    <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount;
+<span class="wl">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_orders_with_payments <span style="color:#ff7b72">AS</span>  <span class="wn">&#x26A1; must wait for steps 2 &amp; 3 &mdash; serial only</span></span>
+  <span style="color:#ff7b72">SELECT</span> o.*, <span style="color:#79c0ff">SUM</span>(p.payment_amount) <span style="color:#ff7b72">AS</span> total_paid
+  <span style="color:#ff7b72">FROM</span> tmp_orders o <span style="color:#ff7b72">LEFT JOIN</span> tmp_payments p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
+  <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount;
 
-  <span class="il">  <span style="color:#ff7b72">CREATE OR REPLACE TABLE</span> analytics.fct_customer_order_summary <span style="color:#ff7b72">AS</span>  <span class="in">⚠ full overwrite every run</span></span>
-    <span style="color:#ff7b72">SELECT</span> c.customer_id, c.email,
-           <span style="color:#79c0ff">COUNT</span>(op.order_id) <span style="color:#ff7b72">AS</span> lifetime_orders,
-           <span style="color:#79c0ff">COALESCE</span>(<span style="color:#79c0ff">SUM</span>(op.total_amount),<span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> lifetime_revenue
-    <span style="color:#ff7b72">FROM</span> tmp_customers c
-    <span style="color:#ff7b72">LEFT JOIN</span> tmp_orders_with_payments op <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
-    <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email;
+<span class="il">  <span style="color:#ff7b72">CREATE OR REPLACE TABLE</span> analytics.fct_customer_order_summary <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; full overwrite every run</span></span>
+  <span style="color:#ff7b72">SELECT</span> c.customer_id, c.email,
+         <span style="color:#79c0ff">COUNT</span>(op.order_id) <span style="color:#ff7b72">AS</span> lifetime_orders,
+         <span style="color:#79c0ff">COALESCE</span>(<span style="color:#79c0ff">SUM</span>(op.total_amount),<span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> lifetime_revenue
+  <span style="color:#ff7b72">FROM</span> tmp_customers c
+  <span style="color:#ff7b72">LEFT JOIN</span> tmp_orders_with_payments op <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
+  <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email;
 
-<span class="il">  <span style="color:#8b949e">-- Session ends. All 4 temp tables dropped. Nothing to inspect if this failed.  <span class="in">⚠ debug from scratch</span></span></span>
+<span class="il">  <span style="color:#8b949e">-- Session ends. All 4 temp tables dropped. Nothing to inspect.  <span class="in">&#x26A0; debug from scratch</span></span></span>
 <span style="color:#ff7b72">END</span>; $$ <span style="color:#ff7b72">LANGUAGE</span> plpgsql;</pre>
-    </div>
-  </div>
-  <p class="caption">One file. Five steps. Whether it succeeds or fails, there's nothing left.</p>
+          </div>
+        </div>
+        <p class="caption" style="padding:0 17px 14px">One file. Five steps. Whether it succeeds or fails, the session ends and there&rsquo;s nothing left to look at.</p>
+      </div>
+
+      <!-- TAB: PYTHON SCRIPT -->
+      <div class="script-panel" id="panel-python">
+        <div class="code-wrap" style="border-color:#f85149">
+          <div class="code-head" style="background:rgba(248,81,73,.05)">
+            <span class="lbl" style="color:#f85149">build_customer_order_summary.py &mdash; pandas pipeline</span>
+            <span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">1 file &middot; 6 steps</span>
+          </div>
+          <div class="code-body"><pre><span style="color:#ff7b72">import</span> pandas <span style="color:#ff7b72">as</span> pd
+<span style="color:#ff7b72">from</span> sqlalchemy <span style="color:#ff7b72">import</span> create_engine
+
+engine = create_engine(<span style="color:#a5d6ff">"postgresql://..."</span>)
+
+<span class="il"><span style="color:#8b949e"># Step 1 &mdash; pull data to this machine  <span class="in">&#x26A0; data transfer &mdash; grows with table size</span></span></span>
+<span class="il">raw_customers = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.customers"</span>, engine)  <span class="in">&#x26A0; hardcoded schema</span></span>
+<span class="il">raw_orders    = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.orders"</span>,    engine)  <span class="in">&#x26A0; hardcoded schema</span></span>
+<span class="il">raw_payments  = pd.read_sql(<span style="color:#a5d6ff">"SELECT * FROM raw.payments"</span>,  engine)  <span class="in">&#x26A0; hardcoded schema</span></span>
+
+<span class="wl"><span style="color:#8b949e"># Step 2 &mdash; clean in memory  <span class="wn">&#x26A1; DataFrame &mdash; gone if process crashes</span></span></span>
+clean_customers = raw_customers.copy()
+clean_customers[<span style="color:#a5d6ff">"email"</span>]      = clean_customers[<span style="color:#a5d6ff">"email"</span>].str.strip().str.lower()
+clean_customers[<span style="color:#a5d6ff">"first_name"</span>] = clean_customers[<span style="color:#a5d6ff">"first_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)
+clean_customers[<span style="color:#a5d6ff">"last_name"</span>]  = clean_customers[<span style="color:#a5d6ff">"last_name"</span>].fillna(<span style="color:#a5d6ff">"Unknown"</span>)
+
+<span class="wl"><span style="color:#8b949e"># Step 3 &mdash; filter orders in memory  <span class="wn">&#x26A1; not queryable after crash</span></span></span>
+clean_orders = (raw_orders
+    .loc[raw_orders[<span style="color:#a5d6ff">"status"</span>] != <span style="color:#a5d6ff">"cancelled"</span>,
+         [<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"order_date"</span>, <span style="color:#a5d6ff">"total_amount"</span>]])
+
+<span class="wl"><span style="color:#8b949e"># Step 4 &mdash; filter payments in memory  <span class="wn">&#x26A1; serial &mdash; must wait for step 3</span></span></span>
+clean_payments = (raw_payments
+    .loc[raw_payments[<span style="color:#a5d6ff">"amount"</span>] &gt; 0]
+    .rename(columns={<span style="color:#a5d6ff">"amount"</span>: <span style="color:#a5d6ff">"payment_amount"</span>})
+    [[<span style="color:#a5d6ff">"payment_id"</span>, <span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"payment_amount"</span>]])
+
+<span style="color:#8b949e"># Step 5 &mdash; join</span>
+pmt_by_order  = clean_payments.groupby(<span style="color:#a5d6ff">"order_id"</span>, as_index=<span style="color:#ff7b72">False</span>)[<span style="color:#a5d6ff">"payment_amount"</span>].sum()
+orders_w_pmts = clean_orders.merge(pmt_by_order, on=<span style="color:#a5d6ff">"order_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)
+
+<span style="color:#8b949e"># Step 6 &mdash; aggregate and write back</span>
+<span class="il">summary = (clean_customers  <span class="in">&#x26A0; full replace every run</span></span>
+    .merge(orders_w_pmts, on=<span style="color:#a5d6ff">"customer_id"</span>, how=<span style="color:#a5d6ff">"left"</span>)
+    .groupby([<span style="color:#a5d6ff">"customer_id"</span>, <span style="color:#a5d6ff">"email"</span>], as_index=<span style="color:#ff7b72">False</span>)
+    .agg(lifetime_orders=(<span style="color:#a5d6ff">"order_id"</span>, <span style="color:#a5d6ff">"count"</span>),
+         lifetime_revenue=(<span style="color:#a5d6ff">"total_amount"</span>, <span style="color:#a5d6ff">"sum"</span>)))
+<span class="il">summary.to_sql(<span style="color:#a5d6ff">"fct_customer_order_summary"</span>, engine,  <span class="in">&#x26A0; data travels back to warehouse</span></span>
+              schema=<span style="color:#a5d6ff">"analytics"</span>, if_exists=<span style="color:#a5d6ff">"replace"</span>, index=<span style="color:#ff7b72">False</span>)
+
+<span style="color:#8b949e"># Process ends. All DataFrames dropped. Nothing survives a crash.</span></pre>
+          </div>
+        </div>
+        <p class="caption" style="padding:0 17px 14px">One file. Data travels to your machine, gets transformed in memory, travels back. Nothing survives if the process dies mid-run.</p>
+      </div>
+
+      <!-- TAB: AIRFLOW DAG -->
+      <div class="script-panel" id="panel-airflow">
+        <div class="code-wrap" style="border-color:#f85149">
+          <div class="code-head" style="background:rgba(248,81,73,.05)">
+            <span class="lbl" style="color:#f85149">customer_order_summary_dag.py &mdash; Airflow</span>
+            <span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">1 DAG &middot; 5 tasks</span>
+          </div>
+          <div class="code-body"><pre><span style="color:#ff7b72">from</span> airflow <span style="color:#ff7b72">import</span> DAG
+<span style="color:#ff7b72">from</span> airflow.operators.python <span style="color:#ff7b72">import</span> PythonOperator
+<span style="color:#ff7b72">from</span> airflow.providers.postgres.hooks.postgres <span style="color:#ff7b72">import</span> PostgresHook
+<span style="color:#ff7b72">from</span> datetime <span style="color:#ff7b72">import</span> datetime
+
+<span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">run_customers</span>(**ctx):
+    PostgresHook(<span style="color:#a5d6ff">"warehouse"</span>).run(<span style="color:#a5d6ff">"""
+        CREATE OR REPLACE TABLE staging.customers AS
+        SELECT customer_id, TRIM(LOWER(email)) AS email,</span>
+<span class="il"><span style="color:#a5d6ff">               COALESCE(first_name,'Unknown') AS first_name  </span><span class="in">&#x26A0; hardcoded schema in each function</span></span>
+<span style="color:#a5d6ff">        FROM raw.customers;
+    """</span>)
+
+<span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">run_orders</span>(**ctx):
+    PostgresHook(<span style="color:#a5d6ff">"warehouse"</span>).run(<span style="color:#a5d6ff">"""
+        CREATE OR REPLACE TABLE staging.orders AS
+        SELECT order_id, customer_id, order_date, total_amount
+        FROM raw.orders WHERE status != 'cancelled';
+    """</span>)
+
+<span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">run_payments</span>(**ctx):
+    PostgresHook(<span style="color:#a5d6ff">"warehouse"</span>).run(<span style="color:#a5d6ff">"""
+        CREATE OR REPLACE TABLE staging.payments AS
+        SELECT payment_id, order_id, amount AS payment_amount
+        FROM raw.payments WHERE amount > 0;
+    """</span>)
+
+<span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">run_orders_with_payments</span>(**ctx):
+    PostgresHook(<span style="color:#a5d6ff">"warehouse"</span>).run(<span style="color:#a5d6ff">"""
+        CREATE OR REPLACE TABLE intermediate.orders_with_payments AS</span>
+<span class="wl"><span style="color:#a5d6ff">        SELECT o.*, SUM(p.payment_amount) AS total_paid  </span><span class="wn">&#x26A1; deps declared in DAG, not in this SQL</span></span>
+<span style="color:#a5d6ff">        FROM staging.orders o
+        LEFT JOIN staging.payments p ON o.order_id = p.order_id
+        GROUP BY o.order_id, o.customer_id, o.order_date, o.total_amount;
+    """</span>)
+
+<span style="color:#ff7b72">def</span> <span style="color:#d2a8ff">run_summary</span>(**ctx):
+    PostgresHook(<span style="color:#a5d6ff">"warehouse"</span>).run(<span style="color:#a5d6ff">"""
+        CREATE OR REPLACE TABLE analytics.fct_customer_order_summary AS
+        SELECT c.customer_id, c.email,
+               COUNT(op.order_id) AS lifetime_orders,
+               COALESCE(SUM(op.total_amount),0) AS lifetime_revenue
+        FROM staging.customers c
+        LEFT JOIN intermediate.orders_with_payments op ON c.customer_id = op.customer_id
+        GROUP BY c.customer_id, c.email;
+    """</span>)
+
+<span style="color:#ff7b72">with</span> DAG(<span style="color:#a5d6ff">"customer_order_summary"</span>, start_date=datetime(<span style="color:#79c0ff">2024</span>,<span style="color:#79c0ff">1</span>,<span style="color:#79c0ff">1</span>), schedule=<span style="color:#a5d6ff">"@daily"</span>) <span style="color:#ff7b72">as</span> dag:
+    t1 = PythonOperator(task_id=<span style="color:#a5d6ff">"stg_customers"</span>,        python_callable=run_customers)
+    t2 = PythonOperator(task_id=<span style="color:#a5d6ff">"stg_orders"</span>,           python_callable=run_orders)
+    t3 = PythonOperator(task_id=<span style="color:#a5d6ff">"stg_payments"</span>,         python_callable=run_payments)
+    t4 = PythonOperator(task_id=<span style="color:#a5d6ff">"int_orders_w_payments"</span>, python_callable=run_orders_with_payments)
+    t5 = PythonOperator(task_id=<span style="color:#a5d6ff">"fct_order_summary"</span>,     python_callable=run_summary)
+
+<span class="il">    [t1, t2, t3] >> t4 >> t5  <span class="in">&#x26A0; lineage lives here, not inside the SQL</span></span></pre>
+          </div>
+        </div>
+        <p class="caption" style="padding:0 17px 14px">Looks structured. But the dependencies live in the DAG definition, not the SQL. Add a new model and you update two places. The SQL still uses hardcoded table names a schema rename can silently break.</p>
+      </div>
+
+    </div><!-- /.script-wrap -->
+  </div><!-- /.script-switcher -->
 
   <div class="pull" style="margin-top:28px">
-    This isn't bad code. It does exactly what it was built to do: run a transformation and produce an output. The problem is that's all it was ever designed to do. Nobody built it to be inspected. So when it breaks, you're starting from scratch.
+    This isn&rsquo;t bad code. It does exactly what it was built to do: run a transformation and produce an output. The problem is that&rsquo;s all it was ever designed to do. Nobody built it to be inspected. So when it breaks, you&rsquo;re starting from scratch.
   </div>
 </div>
 
@@ -228,13 +376,13 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 3: THE OBVIOUS FIX -->
 <div class="section">
   <p class="section-label">The obvious fix</p>
-  <p class="prose">The natural response is: just break it into multiple stored procedures. Chain them together. Each one writes a real table. Now you have intermediate state that survives.</p>
-  <p class="prose" style="margin-top:16px">That does solve the persistence problem. It's genuinely better. But it leaves the harder problems untouched.</p>
-  <p class="prose" style="margin-top:16px">Think about dividing chores among housemates. Person 1 does laundry, Person 2 folds, Person 3 cooks, Person 4 does dishes. Each person finishes their job and leaves the result. That's an improvement over one person doing everything in one uninterruptible session. But someone still has to text the group chat: "Person 2, don't start folding until Person 1 is done with the washer." That coordination — the order, the dependencies — lives in the group chat. Not in the work. If the group chat is wrong, things run out of order. If someone new joins the house, they have to read the entire chat history to understand what runs when and why.</p>
-  <p class="prose" style="margin-top:16px">With chained stored procedures, that group chat is an orchestration script. The dependencies between procedures live outside the code, in a separate system that has to be kept in sync manually. If you add a new procedure, you update the script. If the script breaks, things run in the wrong order. Nobody looking at any individual procedure can tell what it depends on or what depends on it.</p>
-  <p class="prose" style="margin-top:16px">There's also still no shared definition. If two teams both need clean orders data, they each write their own procedure. Over time the logic drifts. And there's still no testing — each procedure assumes the previous one's output was correct.</p>
+  <p class="prose">The natural response depends on where you&rsquo;re starting. If you&rsquo;re on stored procedures, you break them into smaller procedures and chain them together &mdash; each one writes a real table. If you&rsquo;re on a Python script, you add Airflow and turn each step into a task. If you&rsquo;re already on Airflow, you add more structure: better retry logic, SLAs, sensors.</p>
+  <p class="prose" style="margin-top:16px">All of those help. But they leave the harder problems untouched.</p>
+  <p class="prose" style="margin-top:16px">Think about dividing chores among housemates. Person 1 does laundry, Person 2 folds, Person 3 cooks, Person 4 does dishes. Each person finishes their job and leaves the result. That&rsquo;s an improvement over one person doing everything in one uninterruptible session. But someone still has to text the group chat: &ldquo;Person 2, don&rsquo;t start folding until Person 1 is done with the washer.&rdquo; That coordination &mdash; the order, the dependencies &mdash; lives in the group chat. Not in the work.</p>
+  <p class="prose" style="margin-top:16px">That group chat is your orchestration layer &mdash; whether it&rsquo;s a shell script chaining stored procs, an Airflow DAG, or a <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">[t1, t2, t3] &gt;&gt; t4 &gt;&gt; t5</code> definition at the bottom of your DAG file. The dependencies between steps live outside the SQL. If you add a new model, you update two places. Nobody looking at any individual query can tell what it depends on or what depends on it.</p>
+  <p class="prose" style="margin-top:16px">There&rsquo;s also still no shared definition. If two teams both need clean orders data, they each write their own version. Over time the logic drifts. And there&rsquo;s still no testing &mdash; each step assumes the previous one&rsquo;s output was correct.</p>
   <div class="pull" style="margin-top:28px">
-    With dbt, the folding task itself says "I need the washer to finish before I start" — that's what <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> does. The dependency is declared in the code. There's no group chat to maintain, no orchestration script to keep in sync. The order emerges from the work itself.
+    With dbt, the folding task itself says &ldquo;I need the washer to finish before I start&rdquo; &mdash; that&rsquo;s what <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> does. The dependency is declared in the code. There&rsquo;s no group chat to maintain. The order emerges from the work itself.
   </div>
 </div>
 
@@ -243,19 +391,19 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 4: THE SHIFT -->
 <div class="section">
   <p class="section-label">What actually changes</p>
-  <p class="prose">The SQL barely changes. That's not really what dbt does. What changes is what's still there after the pipeline finishes running.</p>
-  <p class="prose">Instead of temp tables that disappear, each step becomes a real table in your warehouse. Hardcoded schema names become <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source()</code>. Implicit ordering becomes explicit dependencies with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code>.</p>
+  <p class="prose">The SQL barely changes. That&rsquo;s not really what dbt does. What changes is what&rsquo;s still there after the pipeline finishes running.</p>
+  <p class="prose">Instead of temp tables or in-memory DataFrames that disappear, each step becomes a real table in your warehouse. Hardcoded schema names become <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">source()</code>. Implicit ordering becomes explicit dependencies with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code>.</p>
   <p class="prose" style="margin-top:16px;margin-bottom:28px">Click any block to see what the actual change looks like.</p>
 
   <div class="expand-block" id="b1" onclick="toggle('b1','r1')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">CREATE TEMP TABLE tmp_customers</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Temp table</span></div>
-    <div class="code-body"><pre><span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_customers <span style="color:#ff7b72">AS</span>  <span class="in">⚠ temp — gone on session end</span></span>
+    <div class="code-body"><pre><span class="il">  <span style="color:#ff7b72">CREATE TEMP TABLE</span> tmp_customers <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; temp &mdash; gone on session end</span></span>
   <span style="color:#ff7b72">SELECT</span> customer_id, <span style="color:#79c0ff">TRIM</span>(<span style="color:#79c0ff">LOWER</span>(email)) <span style="color:#ff7b72">AS</span> email,
          <span style="color:#79c0ff">COALESCE</span>(first_name,<span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
          <span style="color:#79c0ff">COALESCE</span>(last_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
-<span class="il">  <span style="color:#ff7b72">FROM</span> raw.customers;  <span class="in">⚠ hardcoded schema name</span></span></pre></div>
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.customers;  <span class="in">&#x26A0; hardcoded schema name</span></span></pre></div>
     <div class="dbt-reveal" id="r1">
-      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_customers.sql</strong></span></div>
+      <div class="dbt-arrow"><span class="arr">&#x2193;</span><span>becomes &rarr; <strong style="color:#3fb950">models/staging/stg_customers.sql</strong></span></div>
       <div class="dbt-body">
         <pre><span style="color:#8b949e">-- No CREATE. No TEMP. Just SELECT.</span>
 <span style="color:#ff7b72">SELECT</span>
@@ -264,7 +412,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     <span style="color:#79c0ff">COALESCE</span>(first_name, <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> first_name,
     <span style="color:#79c0ff">COALESCE</span>(last_name,  <span style="color:#a5d6ff">'Unknown'</span>) <span style="color:#ff7b72">AS</span> last_name
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'customers'</span>) }}</pre>
-        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. The only things that moved are the wrapper and the reference. No more <code>CREATE TEMP TABLE</code>. dbt handles materialization separately. And <code>raw.customers</code> becomes <code>source('raw','customers')</code>, which tells dbt this is an external entry point it can track and test. The result is a real table in your warehouse, not session-scoped. It's there after the run finishes, whether it succeeded or not.</div>
+        <div class="what-changed"><strong>What changed:</strong> The SQL is identical. No more <code>CREATE TEMP TABLE</code>. dbt handles materialization separately. And <code>raw.customers</code> becomes <code>source('raw','customers')</code>, which tells dbt this is an external entry point it can track and test. The result is a real table in your warehouse, not session-scoped. It&rsquo;s there after the run finishes, whether it succeeded or not.</div>
       </div>
     </div>
   </div>
@@ -272,14 +420,14 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <div class="expand-block" id="b2" onclick="toggle('b2','r2')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">CREATE TEMP TABLE tmp_orders</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Temp table</span></div>
     <div class="code-body"><pre>  <span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
-<span class="il">  <span style="color:#ff7b72">FROM</span> raw.orders <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span>;  <span class="in">⚠ hardcoded schema</span></span></pre></div>
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.orders <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span>;  <span class="in">&#x26A0; hardcoded schema</span></span></pre></div>
     <div class="dbt-reveal" id="r2">
-      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_orders.sql</strong></span></div>
+      <div class="dbt-arrow"><span class="arr">&#x2193;</span><span>becomes &rarr; <strong style="color:#3fb950">models/staging/stg_orders.sql</strong></span></div>
       <div class="dbt-body">
         <pre><span style="color:#ff7b72">SELECT</span> order_id, customer_id, order_date, total_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'orders'</span>) }}
 <span style="color:#ff7b72">WHERE</span> status != <span style="color:#a5d6ff">'cancelled'</span></pre>
-        <div class="what-changed"><strong>What changed:</strong> Now it's its own file. When another team needs clean orders, they use <code>ref('stg_orders')</code> instead of copying this filter logic into their own thing. "What counts as a valid order" lives in one place. It doesn't drift.</div>
+        <div class="what-changed"><strong>What changed:</strong> Now it&rsquo;s its own file. When another team needs clean orders, they use <code>ref('stg_orders')</code> instead of copying this filter logic. &ldquo;What counts as a valid order&rdquo; lives in one place. It doesn&rsquo;t drift.</div>
       </div>
     </div>
   </div>
@@ -287,9 +435,9 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <div class="expand-block" id="b3" onclick="toggle('b3','r3')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">CREATE TEMP TABLE tmp_payments</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Temp table</span></div>
     <div class="code-body"><pre>  <span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
-<span class="il">  <span style="color:#ff7b72">FROM</span> raw.payments <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span>;  <span class="in">⚠ hardcoded schema</span></span></pre></div>
+<span class="il">  <span style="color:#ff7b72">FROM</span> raw.payments <span style="color:#ff7b72">WHERE</span> amount &gt; <span style="color:#79c0ff">0</span>;  <span class="in">&#x26A0; hardcoded schema</span></span></pre></div>
     <div class="dbt-reveal" id="r3">
-      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/staging/stg_payments.sql</strong></span></div>
+      <div class="dbt-arrow"><span class="arr">&#x2193;</span><span>becomes &rarr; <strong style="color:#3fb950">models/staging/stg_payments.sql</strong></span></div>
       <div class="dbt-body">
         <pre><span style="color:#ff7b72">SELECT</span> payment_id, order_id, amount <span style="color:#ff7b72">AS</span> payment_amount
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">source</span>(<span style="color:#a5d6ff">'raw'</span>, <span style="color:#a5d6ff">'payments'</span>) }}
@@ -301,12 +449,12 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
   <div class="expand-block" id="b4" onclick="toggle('b4','r4')">
     <div class="code-head" style="background:rgba(210,153,34,.05)"><span class="lbl" style="color:#d29922">CREATE TEMP TABLE tmp_orders_with_payments</span><span class="badge" style="background:rgba(210,153,34,.14);color:#d29922">Join step</span></div>
-    <div class="code-body"><pre><span class="wl">  <span style="color:#ff7b72">SELECT</span> o.*, <span style="color:#79c0ff">SUM</span>(p.payment_amount) <span style="color:#ff7b72">AS</span> total_paid  <span class="wn">⚡ waits for steps 2 &amp; 3 — but that's implicit</span></span>
+    <div class="code-body"><pre><span class="wl">  <span style="color:#ff7b72">SELECT</span> o.*, <span style="color:#79c0ff">SUM</span>(p.payment_amount) <span style="color:#ff7b72">AS</span> total_paid  <span class="wn">&#x26A1; waits for steps 2 &amp; 3 &mdash; but that&rsquo;s implicit</span></span>
   <span style="color:#ff7b72">FROM</span> tmp_orders o
   <span style="color:#ff7b72">LEFT JOIN</span> tmp_payments p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
   <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount</pre></div>
     <div class="dbt-reveal" id="r4">
-      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/intermediate/int_orders_with_payments.sql</strong></span></div>
+      <div class="dbt-arrow"><span class="arr">&#x2193;</span><span>becomes &rarr; <strong style="color:#3fb950">models/intermediate/int_orders_with_payments.sql</strong></span></div>
       <div class="dbt-body">
         <pre><span style="color:#ff7b72">SELECT</span>
     o.order_id, o.customer_id, o.order_date, o.total_amount,
@@ -314,14 +462,14 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_payments'</span>) }} p <span style="color:#ff7b72">ON</span> o.order_id = p.order_id
 <span style="color:#ff7b72">GROUP BY</span> o.order_id, o.customer_id, o.order_date, o.total_amount</pre>
-        <div class="what-changed"><strong>What changed:</strong> <code>tmp_orders</code> and <code>tmp_payments</code> become <code>ref('stg_orders')</code> and <code>ref('stg_payments')</code>. Those <code>ref()</code> calls tell dbt what this model needs before it can run. You don't write any orchestration logic. The <code>ref()</code> calls are the orchestration.</div>
+        <div class="what-changed"><strong>What changed:</strong> Those <code>ref()</code> calls tell dbt what this model needs before it can run. You don&rsquo;t write any orchestration logic. The <code>ref()</code> calls are the orchestration.</div>
       </div>
     </div>
   </div>
 
   <div class="expand-block" id="b5" onclick="toggle('b5','r5')">
     <div class="code-head" style="background:rgba(248,81,73,.05)"><span class="lbl" style="color:#f85149">CREATE OR REPLACE TABLE fct_customer_order_summary</span><span class="badge" style="background:rgba(248,81,73,.14);color:#f85149">Full overwrite</span></div>
-    <div class="code-body"><pre><span class="il">  <span style="color:#ff7b72">CREATE OR REPLACE TABLE</span> analytics.fct_customer_order_summary <span style="color:#ff7b72">AS</span>  <span class="in">⚠ full overwrite every run</span></span>
+    <div class="code-body"><pre><span class="il">  <span style="color:#ff7b72">CREATE OR REPLACE TABLE</span> analytics.fct_customer_order_summary <span style="color:#ff7b72">AS</span>  <span class="in">&#x26A0; full overwrite every run</span></span>
   <span style="color:#ff7b72">SELECT</span> c.customer_id, c.email,
          <span style="color:#79c0ff">COUNT</span>(op.order_id) <span style="color:#ff7b72">AS</span> lifetime_orders,
          <span style="color:#79c0ff">COALESCE</span>(<span style="color:#79c0ff">SUM</span>(op.total_amount),<span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> lifetime_revenue
@@ -329,7 +477,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <span style="color:#ff7b72">LEFT JOIN</span> tmp_orders_with_payments op <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
   <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email;</pre></div>
     <div class="dbt-reveal" id="r5">
-      <div class="dbt-arrow"><span class="arr">↓</span><span>becomes → <strong style="color:#3fb950">models/marts/fct_customer_order_summary.sql</strong></span></div>
+      <div class="dbt-arrow"><span class="arr">&#x2193;</span><span>becomes &rarr; <strong style="color:#3fb950">models/marts/fct_customer_order_summary.sql</strong></span></div>
       <div class="dbt-body">
         <pre><span style="color:#8b949e">-- Materialization (table, incremental, view) is config, not SQL.</span>
 <span style="color:#ff7b72">SELECT</span>
@@ -340,7 +488,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'int_orders_with_payments'</span>) }} op
     <span style="color:#ff7b72">ON</span> c.customer_id = op.customer_id
 <span style="color:#ff7b72">GROUP BY</span> c.customer_id, c.email</pre>
-        <div class="what-changed"><strong>The pattern:</strong> <code>CREATE TEMP TABLE</code> → SQL file. <code>raw.schema</code> → <code>source()</code>. <code>tmp_x</code> → <code>ref()</code>. That's the whole migration. The logic is the same. What changes is what the pipeline leaves behind when it runs.</div>
+        <div class="what-changed"><strong>The pattern:</strong> <code>CREATE TEMP TABLE</code> &rarr; SQL file. <code>raw.schema</code> &rarr; <code>source()</code>. <code>tmp_x</code> &rarr; <code>ref()</code>. That&rsquo;s the whole migration. The logic is the same. What changes is what the pipeline leaves behind when it runs.</div>
       </div>
     </div>
   </div>
@@ -348,10 +496,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <div class="sep"></div>
 
-<!-- SECTION 4: THE STRUCTURE EMERGES -->
+<!-- SECTION 5: THE STRUCTURE EMERGES -->
 <div class="section">
   <p class="section-label">What emerges</p>
-  <p class="prose">The stored procedure had this exact structure inside it. The same dependencies existed — they just weren't visible anywhere. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call you write is a dependency declaration. dbt reads them all and figures out the execution order. You don't define the graph. It comes out of the code.</p>
+  <p class="prose">The script had this exact structure inside it the whole time. The same dependencies existed &mdash; they just weren&rsquo;t visible anywhere. Every <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> call you write is a dependency declaration. dbt reads them all and figures out the execution order. You don&rsquo;t define the graph. It comes out of the code.</p>
 
   <div class="dag-wrap" style="padding:16px">
     <svg viewBox="0 0 860 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px">
@@ -382,16 +530,16 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <text x="524" y="300" fill="#444c56" font-family="DM Sans,sans-serif" font-size="11" text-anchor="middle" font-style="italic">waits for stg_orders + stg_payments</text>
     </svg>
   </div>
-  <p class="caption">All of this existed inside the stored procedure. It just wasn't visible.</p>
+  <p class="caption">All of this existed inside the script. It just wasn&rsquo;t visible.</p>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 5: PARALLELISM -->
+<!-- SECTION 6: PARALLELISM -->
 <div class="section">
   <p class="section-label">The consequence</p>
-  <p class="prose">Once the dependencies are explicit, dbt knows which models don't depend on each other. So it runs them at the same time. The stored procedure couldn't do that. It ran everything in order, one step after another, because there was no other option.</p>
-  <p class="prose" style="margin-top:16px">Think of it like chores. You wouldn't start the washing machine, wait for it to finish, move the clothes to the dryer, wait for that to finish, and only then start cooking — then do the dishes after you're done eating. Some of those things are related (the dryer waits on the washer), but most aren't. You'd run the independent ones in parallel. That's exactly what the lineage makes visible. dbt sees which models need to wait for each other and which don't. The ones that don't, start at the same time.</p>
+  <p class="prose">Once the dependencies are explicit, dbt knows which models don&rsquo;t depend on each other. So it runs them at the same time. The script couldn&rsquo;t do that. It ran everything in order, one step after another, because there was no other option.</p>
+  <p class="prose" style="margin-top:16px">Think of it like chores. You wouldn&rsquo;t start the washing machine, wait for it to finish, move the clothes to the dryer, wait for that to finish, and only then start cooking. Some of those things are related, but most aren&rsquo;t. You&rsquo;d run the independent ones in parallel. That&rsquo;s exactly what the lineage makes visible.</p>
 
   <div class="dag-wrap" style="padding:16px 20px;margin-top:20px;margin-bottom:4px">
   <svg viewBox="0 0 390 192" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:300px">
@@ -400,25 +548,25 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </defs>
     <text x="20" y="30" font-family="JetBrains Mono,monospace" font-size="8" fill="#58a6ff" letter-spacing="1.5" opacity=".85">LAUNDRY</text>
     <rect x="20" y="38" width="86" height="52" rx="7" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="1.5"/>
-    <text x="63" y="60" text-anchor="middle" font-size="18">🧺</text>
+    <text x="63" y="60" text-anchor="middle" font-size="18">&#x1F9FA;</text>
     <text x="63" y="79" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff" font-weight="600">wash</text>
     <line x1="107" y1="64" x2="132" y2="64" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch2)"/>
     <rect x="134" y="38" width="86" height="52" rx="7" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="1.5"/>
-    <text x="177" y="60" text-anchor="middle" font-size="18">🌀</text>
+    <text x="177" y="60" text-anchor="middle" font-size="18">&#x1F300;</text>
     <text x="177" y="79" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff" font-weight="600">dry</text>
     <line x1="221" y1="64" x2="246" y2="64" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch2)"/>
     <rect x="248" y="38" width="86" height="52" rx="7" fill="rgba(88,166,255,.07)" stroke="#58a6ff" stroke-width="1.5"/>
-    <text x="291" y="60" text-anchor="middle" font-size="18">👕</text>
+    <text x="291" y="60" text-anchor="middle" font-size="18">&#x1F455;</text>
     <text x="291" y="79" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff" font-weight="600">fold</text>
     <line x1="291" y1="91" x2="291" y2="104" stroke="#21262d" stroke-width="1" stroke-dasharray="3,4" opacity=".5"/>
     <line x1="63" y1="91" x2="63" y2="112" stroke="#21262d" stroke-width="1" stroke-dasharray="3,4" opacity=".5"/>
     <text x="20" y="113" font-family="JetBrains Mono,monospace" font-size="8" fill="#d29922" letter-spacing="1.5" opacity=".85">COOKING</text>
     <rect x="20" y="121" width="86" height="52" rx="7" fill="rgba(210,153,34,.07)" stroke="#d29922" stroke-width="1.5"/>
-    <text x="63" y="143" text-anchor="middle" font-size="18">🍳</text>
+    <text x="63" y="143" text-anchor="middle" font-size="18">&#x1F373;</text>
     <text x="63" y="162" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d29922" font-weight="600">cook</text>
     <line x1="107" y1="147" x2="132" y2="147" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch2)"/>
     <rect x="134" y="121" width="86" height="52" rx="7" fill="rgba(210,153,34,.07)" stroke="#d29922" stroke-width="1.5"/>
-    <text x="177" y="143" text-anchor="middle" font-size="18">🍽️</text>
+    <text x="177" y="143" text-anchor="middle" font-size="18">&#x1F37D;&#xFE0F;</text>
     <text x="177" y="162" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d29922" font-weight="600">dishes</text>
   </svg>
   </div>
@@ -426,7 +574,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
   <div class="par-wrap" style="margin-top:24px">
     <div class="par-block">
-      <h4>❌ stored procedure: serial only</h4>
+      <h4>&#x274C; script: serial only</h4>
       <div class="bar-row"><span class="bar-lbl">step 1</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#58a6ff;left:0%">stg_cust</div></div></div>
       <div class="bar-row"><span class="bar-lbl">step 2</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#3fb950;left:20%">stg_orders</div></div></div>
       <div class="bar-row"><span class="bar-lbl">step 3</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#d29922;left:40%">stg_pay</div></div></div>
@@ -435,7 +583,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <p class="par-note">Total time: <strong style="color:#f85149">5 units</strong></p>
     </div>
     <div class="par-block">
-      <h4>✅ dbt: parallel across threads</h4>
+      <h4>&#x2705; dbt: parallel across threads</h4>
       <div class="bar-row"><span class="bar-lbl">thread 1</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#58a6ff;left:0%">stg_cust</div></div></div>
       <div class="bar-row"><span class="bar-lbl">thread 2</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#3fb950;left:0%">stg_orders</div></div></div>
       <div class="bar-row"><span class="bar-lbl">thread 3</span><div class="bar-track"><div class="bar-fill" style="width:20%;background:#d29922;left:0%">stg_pay</div></div></div>
@@ -449,39 +597,39 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <div class="sep"></div>
 
-<!-- SECTION 6: WHEN IT BREAKS -->
+<!-- SECTION 7: WHEN IT BREAKS -->
 <div class="section">
   <p class="section-label">When it breaks</p>
   <p class="prose">This is where it actually matters. Not when things go well. When they break. Click each scenario.</p>
 
   <div style="margin-top:24px">
     <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline fails at the join step</span><span class="chevron">▼</span></div>
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Pipeline fails at the join step</span><span class="chevron">&#x25BC;</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>Step 4 failed. The temp tables from steps 1–3 died with the session. They're gone. To figure out what happened you have to re-run the whole thing from the top. Every single debug attempt is a full re-run.</p></div>
+          <div class="dc"><div class="ch">script</div><p>Step 4 failed. The temp tables or DataFrames from steps 1&ndash;3 died with the process. To figure out what happened you have to re-run the whole thing from the top. Every single debug attempt is a full re-run.</p></div>
           <div class="dc"><div class="ch">dbt</div><p><code>stg_orders</code> and <code>stg_payments</code> are still in the warehouse. Run <code>dbt run -s int_orders_with_payments</code> to re-execute just the thing that failed.</p></div>
         </div>
-        <div class="scenario-note"><strong>The difference:</strong> dbt models are real warehouse tables. Stored proc temps aren't. That's really the whole thing.</div>
+        <div class="scenario-note"><strong>The difference:</strong> dbt models are real warehouse tables. Script intermediates aren&rsquo;t. That&rsquo;s really the whole thing.</div>
       </div>
     </div>
 
     <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Wrong row count in the final output</span><span class="chevron">▼</span></div>
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Wrong row count in the final output</span><span class="chevron">&#x25BC;</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>Add debug tables mid-proc, re-run everything, query each one. You're doing this multiple times before you find where the rows got out of control.</p></div>
+          <div class="dc"><div class="ch">script</div><p>Add debug statements, re-run everything, check the counts. Multiple cycles before you find where the rows got out of control. The intermediate state is gone &mdash; you have to recreate it every time.</p></div>
           <div class="dc"><div class="ch">dbt</div><p>Query <code>stg_orders</code>. How many rows? Query <code>int_orders_with_payments</code>. How many? The difference tells you exactly where the problem is. No re-run needed.</p></div>
         </div>
-        <div class="scenario-note">Same approach you'd use to bisect a code bug. Except you don't have to re-run anything.</div>
+        <div class="scenario-note">Same approach you&rsquo;d use to bisect a code bug. Except you don&rsquo;t have to re-run anything.</div>
       </div>
     </div>
 
     <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Upstream schema change: a column renamed</span><span class="chevron">▼</span></div>
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Upstream schema change: a column renamed</span><span class="chevron">&#x25BC;</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>The proc fails or silently returns NULLs. You trace back through the file to figure out which temp table got hit. Then you hope nothing downstream was depending on it.</p></div>
+          <div class="dc"><div class="ch">script</div><p>The script fails or silently returns NULLs. You trace back through the file to figure out which step got hit. If you have Airflow, you check three files instead of one. Then you hope nothing downstream was depending on it.</p></div>
           <div class="dc"><div class="ch">dbt</div><p><code>stg_payments</code> is the only model that touches <code>raw.payments</code>. Fix it there. Everything downstream picks up the change automatically.</p></div>
         </div>
         <div class="scenario-note">The <code>stg_</code> layer is an isolation boundary. Raw schema changes only affect one file.</div>
@@ -489,10 +637,10 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </div>
 
     <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">3am on-call alert fires</span><span class="chevron">▼</span></div>
+      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">3am on-call alert fires</span><span class="chevron">&#x25BC;</span></div>
       <div class="scenario-body">
         <div class="scenario-split">
-          <div class="dc"><div class="ch">stored procedure</div><p>Nothing survived from the last run. You have to re-run the whole thing just to reproduce the failure. Then add <code>RAISE NOTICE</code> calls. Re-run again. You're 45 minutes in before you've even started fixing anything.</p></div>
+          <div class="dc"><div class="ch">script</div><p>Nothing survived from the last run. You have to re-run the whole thing just to reproduce the failure. Then add logging. Re-run again. You&rsquo;re 45 minutes in before you&rsquo;ve even started fixing anything.</p></div>
           <div class="dc"><div class="ch">dbt</div><p>The run logs tell you exactly which model failed and why. The intermediate models are still in the warehouse. Fix the issue, re-run just that model and what depends on it.</p></div>
         </div>
         <div class="scenario-note">The engineer on-call at 3am cares a lot about whether the intermediate state survived.</div>
@@ -503,12 +651,11 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <div class="sep"></div>
 
-<!-- SECTION 7: BEFORE IT BREAKS -->
+<!-- SECTION 8: BEFORE IT BREAKS -->
 <div class="section">
   <p class="section-label">Before it breaks</p>
-  <p class="prose">All the scenarios above start the same way: someone discovers a problem after the fact. A dashboard is broken. The row count is off. An alert fires at 3am. That's the equivalent of opening the dryer and finding your clothes still wet. You only know because you went to use the output.</p>
-  <p class="prose" style="margin-top:16px">Alerting is like a dryer with a sensor that tells you there's an issue before you even start the cycle. You never end up with wet clothes, because the system caught the problem upstream. If you need to rush out the door, you find out in time to do something about it, not when you're already late.</p>
-  <p class="prose" style="margin-top:16px">Most data workflows don't have testing built in. So problems surface downstream, at the wrong time, in ways that affect real decisions. You come home hungry and don't know the refrigerator broke, so you spend money on takeout, and <em>then</em> discover you also have to fix the fridge. Two problems instead of one, because the first one wasn't visible when it would have been cheapest to catch.</p>
+  <p class="prose">All the scenarios above start the same way: someone discovers a problem after the fact. A dashboard is broken. The row count is off. An alert fires at 3am. That&rsquo;s the equivalent of opening the dryer and finding your clothes still wet. You only know because you went to use the output.</p>
+  <p class="prose" style="margin-top:16px">Most data workflows don&rsquo;t have testing built in. So problems surface downstream, at the wrong time, in ways that affect real decisions. You come home hungry and don&rsquo;t know the refrigerator broke, so you spend money on takeout, and <em>then</em> discover you also have to fix the fridge. Two problems instead of one, because the first one wasn&rsquo;t visible when it would have been cheapest to catch.</p>
   <p class="prose" style="margin-top:16px">dbt tests are that earlier detection point. A freshness check, a not-null assertion, a referential integrity test. These run before the data reaches the dashboard. If something upstream is wrong, it surfaces at the source, not in the numbers your stakeholders are using to make decisions.</p>
 
   <div class="dag-wrap" style="padding:0;overflow:hidden;margin-top:24px;margin-bottom:4px">
@@ -517,73 +664,79 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <marker id="ar-ch3" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="7" markerHeight="5" orient="auto-start-reverse"><path d="M 0 0 L 10 3.5 L 0 7 z" fill="#444c56"/></marker>
     </defs>
     <rect x="0" y="0" width="520" height="26" fill="rgba(248,81,73,.07)"/>
-    <text x="16" y="17" font-family="JetBrains Mono,monospace" font-size="10" fill="#f85149" font-weight="600" letter-spacing=".5">✕  without tests</text>
+    <text x="16" y="17" font-family="JetBrains Mono,monospace" font-size="10" fill="#f85149" font-weight="600" letter-spacing=".5">&#x2715;  without tests</text>
     <rect x="16" y="36" width="78" height="52" rx="7" fill="rgba(248,81,73,.05)" stroke="#f85149" stroke-width="1.5" opacity=".5"/>
-    <text x="55" y="59" text-anchor="middle" font-size="18">🧊</text>
+    <text x="55" y="59" text-anchor="middle" font-size="18">&#x1F9CA;</text>
     <text x="55" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#8b949e" font-weight="600">fridge</text>
     <line x1="95" y1="62" x2="110" y2="62" stroke="#f85149" stroke-width="1.5" marker-end="url(#ar-ch3)" opacity=".5"/>
     <rect x="112" y="36" width="78" height="52" rx="7" fill="rgba(248,81,73,.06)" stroke="#f85149" stroke-width="1.5"/>
-    <text x="151" y="59" text-anchor="middle" font-size="18">🍎</text>
+    <text x="151" y="59" text-anchor="middle" font-size="18">&#x1F34E;</text>
     <text x="151" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#f85149" font-weight="600">food spoils</text>
     <line x1="191" y1="62" x2="206" y2="62" stroke="#f85149" stroke-width="1.5" marker-end="url(#ar-ch3)" opacity=".65"/>
     <rect x="208" y="36" width="78" height="52" rx="7" fill="rgba(248,81,73,.07)" stroke="#f85149" stroke-width="1.5"/>
-    <text x="247" y="59" text-anchor="middle" font-size="18">😤</text>
+    <text x="247" y="59" text-anchor="middle" font-size="18">&#x1F624;</text>
     <text x="247" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#f85149" font-weight="600">home hungry</text>
     <line x1="287" y1="62" x2="302" y2="62" stroke="#f85149" stroke-width="1.5" marker-end="url(#ar-ch3)" opacity=".8"/>
     <rect x="304" y="36" width="78" height="52" rx="7" fill="rgba(248,81,73,.09)" stroke="#f85149" stroke-width="1.5"/>
-    <text x="343" y="59" text-anchor="middle" font-size="18">💸</text>
+    <text x="343" y="59" text-anchor="middle" font-size="18">&#x1F4B8;</text>
     <text x="343" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#f85149" font-weight="600">takeout $$$</text>
     <line x1="383" y1="62" x2="398" y2="62" stroke="#f85149" stroke-width="1.5" marker-end="url(#ar-ch3)"/>
     <rect x="400" y="36" width="96" height="52" rx="7" fill="rgba(248,81,73,.12)" stroke="#f85149" stroke-width="2"/>
-    <text x="448" y="59" text-anchor="middle" font-size="18">🔧</text>
+    <text x="448" y="59" text-anchor="middle" font-size="18">&#x1F527;</text>
     <text x="448" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#f85149" font-weight="600">fix fridge too</text>
     <line x1="0" y1="102" x2="520" y2="102" stroke="#21262d" stroke-width="1"/>
     <rect x="0" y="102" width="520" height="26" fill="rgba(63,185,80,.07)"/>
-    <text x="16" y="119" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="600" letter-spacing=".5">✓  with tests</text>
+    <text x="16" y="119" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="600" letter-spacing=".5">&#x2713;  with tests</text>
     <rect x="16" y="136" width="78" height="52" rx="7" fill="rgba(63,185,80,.04)" stroke="#3fb950" stroke-width="1.5" opacity=".5"/>
-    <text x="55" y="159" text-anchor="middle" font-size="18">🧊</text>
+    <text x="55" y="159" text-anchor="middle" font-size="18">&#x1F9CA;</text>
     <text x="55" y="178" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#8b949e" font-weight="600">fridge</text>
     <line x1="95" y1="162" x2="110" y2="162" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch3)" opacity=".7"/>
     <rect x="112" y="136" width="78" height="52" rx="7" fill="rgba(63,185,80,.07)" stroke="#3fb950" stroke-width="1.5"/>
-    <text x="151" y="159" text-anchor="middle" font-size="18">🔔</text>
+    <text x="151" y="159" text-anchor="middle" font-size="18">&#x1F514;</text>
     <text x="151" y="178" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#3fb950" font-weight="600">alert fires</text>
     <line x1="191" y1="162" x2="206" y2="162" stroke="#444c56" stroke-width="1.5" marker-end="url(#ar-ch3)" opacity=".7"/>
     <rect x="208" y="136" width="92" height="52" rx="7" fill="rgba(63,185,80,.11)" stroke="#3fb950" stroke-width="2"/>
-    <text x="254" y="159" text-anchor="middle" font-size="18">✅</text>
+    <text x="254" y="159" text-anchor="middle" font-size="18">&#x2705;</text>
     <text x="254" y="178" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8.5" fill="#3fb950" font-weight="600">handled early</text>
   </svg>
   </div>
   <p class="caption" style="margin-bottom:0">One broken fridge cascades into five problems without visibility. Tests catch it at the source, before anything downstream is affected.</p>
 
   <div class="pull" style="margin-top:28px">
-    A broken dashboard and wet laundry are the same thing: discovery after the fact. Tests move the detection point upstream: before the run completes, before the stakeholder sees the output, before the problem compounds into something more expensive to fix.
+    A broken dashboard and wet laundry are the same thing: discovery after the fact. Tests move the detection point upstream &mdash; before the run completes, before the stakeholder sees the output, before the problem compounds.
   </div>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 8: THE POINT -->
+<!-- SECTION 9: THE POINT -->
 <div class="section">
   <p class="section-label">The point</p>
-  <p class="conclusion">The stored procedure is not your enemy.</p>
-  <p class="conclusion">The invisible pipeline is. The one that runs and disappears. The one that leaves you nothing to look at when something goes wrong. Debugging it means starting over every time, because nothing survived.</p>
+  <p class="conclusion">The script is not your enemy.</p>
+  <p class="conclusion">The invisible pipeline is. The one that runs and disappears. Whether it&rsquo;s a stored procedure that drops its temp tables, a Python script that loses its DataFrames, or an Airflow DAG whose tasks know their order but not their lineage &mdash; the problem is the same: debugging means starting over.</p>
   <p class="prose">dbt fixes that not by being a better query runner. The SQL is basically the same. It fixes it by making every step a real table that sticks around. The pipeline runs. The tables survive. When something breaks, you start from evidence, not from memory.</p>
-  <p class="prose" style="margin-top:16px">When you're evaluating any data pipeline, there's one question worth asking: <em>what does it leave behind when it runs?</em></p>
+  <p class="prose" style="margin-top:16px">When you&rsquo;re evaluating any data pipeline, there&rsquo;s one question worth asking: <em>what does it leave behind when it runs?</em></p>
   <div class="pull" style="margin-top:28px">
-    If the answer is just the final output: you're one failure away from starting from scratch.<br>
-    If the answer is every intermediate step as a real table you can query: you're debugging from evidence.<br>
-    <em>That's what the migration is actually about. The SQL is almost beside the point.</em>
+    If the answer is just the final output: you&rsquo;re one failure away from starting from scratch.<br>
+    If the answer is every intermediate step as a real table you can query: you&rsquo;re debugging from evidence.<br>
+    <em>That&rsquo;s what the migration is actually about. The SQL is almost beside the point.</em>
   </div>
 </div>
 
 <!-- FOOTER -->
 <div class="post-footer">
-  <a href="../../" class="footer-back">← dbt perspectives</a>
+  <a href="../../" class="footer-back">&larr; dbt perspectives</a>
   <div class="footer-gh"><a href="https://github.com/cedricturner/dbt-perspectives" target="_blank" rel="noopener noreferrer"><svg height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>view source</a></div>
 </div>
 
 </div>
 <script>
+function switchTab(type) {
+  document.querySelectorAll('.script-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.script-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelector('[onclick="switchTab(\''+type+'\')"]').classList.add('active');
+  document.getElementById('panel-'+type).classList.add('active');
+}
 function toggle(bid,rid){
   var b=document.getElementById(bid),r=document.getElementById(rid);
   var open=r.classList.contains('show');
