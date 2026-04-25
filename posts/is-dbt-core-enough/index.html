@@ -90,6 +90,27 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
 .footer-gh a:hover{color:#8b949e}
 
+/* Architecture diagram */
+.arch-diagram{background:#0c1219;border:1px solid #2d333b;border-radius:9px;padding:24px;margin:24px 0}
+.arch-shared{display:flex;flex-direction:column;align-items:center;gap:0}
+.arch-shared-tier{display:flex;align-items:center;gap:12px;background:#161b22;border:1px solid #2d333b;border-radius:7px;padding:10px 16px;width:100%;max-width:540px}
+.arch-layer-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8b949e;min-width:96px;flex-shrink:0}
+.arch-layer-val{font-size:12px;color:#c9d1d9;flex:1}
+.arch-same-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:99px;background:rgba(63,185,80,.1);color:#3fb950;border:1px solid rgba(63,185,80,.2);flex-shrink:0}
+.arch-connector{color:#444c56;font-size:13px;text-align:center;margin:4px 0;width:100%;max-width:540px}
+.arch-split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.arch-col-head{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:10px}
+.arch-col-tier{border-radius:7px;padding:10px 12px;margin-bottom:8px}
+.arch-col-tier:last-child{margin-bottom:0}
+.arch-col-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.arch-col-val{font-size:12px;line-height:1.55}
+.arch-core-tier{background:rgba(139,148,158,.04);border:1px solid #2d333b}
+.arch-core-tier .arch-col-label{color:#444c56}
+.arch-core-tier .arch-col-val{color:#8b949e}
+.arch-platform-tier{background:rgba(255,107,53,.04);border:1px solid rgba(255,107,53,.2)}
+.arch-platform-tier .arch-col-label{color:#ff6b35}
+.arch-platform-tier .arch-col-val{color:#c9d1d9}
+
 /* Scenario styling */
 .scenario{margin-bottom:10px;border-radius:9px;overflow:hidden;border:1px solid #2d333b}
 .scenario-trigger{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#161b22;user-select:none}
@@ -111,7 +132,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .scenario-note{font-size:12px;color:#8b949e;padding:10px 15px;background:#0e1117;border-top:1px solid #2d333b;line-height:1.55}
 .scenario-note strong{color:#e6edf3}
 
-@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.ai-layer{flex-direction:column;gap:6px}.ai-arrow{display:none}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
+@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.ai-layer{flex-direction:column;gap:6px}.ai-arrow{display:none}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}.arch-split{grid-template-columns:1fr}.arch-shared-tier{max-width:100%}.arch-connector{max-width:100%}}
 </style>
 </head>
 <body>
@@ -229,6 +250,72 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
   <div class="pull" style="margin-top:28px">
     Core is free in licensing cost. It's not free in operational cost. You're paying with engineer hours instead of seat fees. For small teams with infrastructure experience, that trade is worth it. For teams that would rather spend those hours on analytics, it's often not.
   </div>
+
+  <p class="prose" style="margin-top:28px">Here's what that looks like as a full stack — from ingestion to consumption. The transformation box is identical in both. The decision is about what wraps it.</p>
+
+  <div class="arch-diagram">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#444c56;margin-bottom:20px">ingestion → storage → transformation → consumption</p>
+
+    <div class="arch-shared">
+      <div class="arch-shared-tier">
+        <span class="arch-layer-label">ingestion</span>
+        <span class="arch-layer-val">Fivetran · Airbyte · custom scripts</span>
+        <span class="arch-same-badge">same</span>
+      </div>
+      <div class="arch-connector">↓</div>
+      <div class="arch-shared-tier">
+        <span class="arch-layer-label">warehouse</span>
+        <span class="arch-layer-val">Snowflake · BigQuery · Databricks · Redshift</span>
+        <span class="arch-same-badge">same</span>
+      </div>
+      <div class="arch-connector">↓</div>
+      <div class="arch-shared-tier" style="border-color:rgba(255,107,53,.3);background:rgba(255,107,53,.05)">
+        <span class="arch-layer-label" style="color:#ff6b35">transformation</span>
+        <span class="arch-layer-val" style="color:#e6edf3;font-weight:500">dbt Core</span>
+        <span class="arch-same-badge">same engine</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;margin:16px 0 18px">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,#2d333b)"></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#444c56;flex-shrink:0">stack diverges here</span>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,#2d333b,transparent)"></div>
+    </div>
+
+    <div class="arch-split">
+      <div>
+        <div class="arch-col-head" style="color:#8b949e">dbt Core</div>
+        <div class="arch-col-tier arch-core-tier">
+          <div class="arch-col-label">orchestration</div>
+          <div class="arch-col-val">Airflow, Prefect, cron — you build and maintain this</div>
+        </div>
+        <div class="arch-col-tier arch-core-tier">
+          <div class="arch-col-label">docs &amp; metadata</div>
+          <div class="arch-col-val">Static HTML you generate and host — not queryable via API</div>
+        </div>
+        <div class="arch-col-tier arch-core-tier">
+          <div class="arch-col-label">consumption</div>
+          <div class="arch-col-val">BI tools query warehouse directly — no semantic layer, no metadata API for AI</div>
+        </div>
+      </div>
+      <div>
+        <div class="arch-col-head" style="color:#ff6b35">dbt Platform</div>
+        <div class="arch-col-tier arch-platform-tier">
+          <div class="arch-col-label">orchestration</div>
+          <div class="arch-col-val">Built-in scheduler, CI on every PR, failure alerting — managed</div>
+        </div>
+        <div class="arch-col-tier arch-platform-tier">
+          <div class="arch-col-label">docs &amp; metadata</div>
+          <div class="arch-col-val">dbt Explorer, Discovery API, column-level lineage — queryable by systems</div>
+        </div>
+        <div class="arch-col-tier arch-platform-tier">
+          <div class="arch-col-label">consumption</div>
+          <div class="arch-col-val">BI tools + semantic layer + AI agents can query metadata via API</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="caption">The transformation tier is the same in both. Every difference above and below it is operational — what runs the jobs, what exposes the metadata, what downstream tools can actually access.</p>
 </div>
 
 <div class="sep"></div>
