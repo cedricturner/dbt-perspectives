@@ -90,7 +90,28 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
 .footer-gh a:hover{color:#8b949e}
 
-@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.ai-layer{flex-direction:column;gap:6px}.ai-arrow{display:none}}
+/* Scenario styling */
+.scenario{margin-bottom:10px;border-radius:9px;overflow:hidden;border:1px solid #2d333b}
+.scenario-trigger{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#161b22;user-select:none}
+.scenario-trigger:hover{background:#1c2129}
+.scenario-trigger .sname{font-size:13px;font-weight:500}
+.chevron{color:#8b949e;font-size:11px;transition:transform .2s}
+.scenario-trigger.open .chevron{transform:rotate(180deg)}
+.scenario-body{display:none}
+.scenario-body.show{display:block}
+.scenario-split{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2d333b}
+.dc{padding:13px 15px}
+.dc:first-child{border-right:1px solid #2d333b;background:rgba(248,81,73,.03)}
+.dc:last-child{background:rgba(63,185,80,.03)}
+.dc .ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
+.dc:first-child .ch{color:#f85149}
+.dc:last-child .ch{color:#3fb950}
+.dc p{font-size:12px;color:#8b949e;line-height:1.6}
+.dc code{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,.07);padding:1px 4px;border-radius:3px;color:#e6edf3}
+.scenario-note{font-size:12px;color:#8b949e;padding:10px 15px;background:#0e1117;border-top:1px solid #2d333b;line-height:1.55}
+.scenario-note strong{color:#e6edf3}
+
+@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.ai-layer{flex-direction:column;gap:6px}.ai-arrow{display:none}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
 </style>
 </head>
 <body>
@@ -102,27 +123,27 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <div class="hero">
   <div class="hero-tag">Architecture</div>
   <h1>Is dbt Core enough<br>in the age of AI?</h1>
-  <p class="lede">For most of dbt's history, this was a straightforward question. AI changed the calculus. Not because of AI features in dbt Cloud, but because of what AI agents actually need from your data infrastructure.</p>
+  <p class="lede">For most of dbt's history, this was a straightforward question. AI changed the calculus. Not because of AI features in dbt Platform, but because of what AI agents actually need from your data infrastructure.</p>
 </div>
 
 <!-- COLLAPSE: What is dbt Core vs dbt Cloud? -->
 <div class="expand-block" style="margin-bottom:52px">
   <div class="expand-trigger" onclick="toggleExpand(this)">
-    <span class="expand-label">↓ What is dbt Core vs dbt Cloud? (expand if unfamiliar)</span>
+    <span class="expand-label">↓ What is dbt Core vs dbt Platform? (expand if unfamiliar)</span>
     <span class="expand-chevron">▼</span>
   </div>
   <div class="expand-body">
     <p class="prose">dbt Core is the open-source transformation framework. You install it locally or in a container, write SQL models, and run them against your warehouse. It handles dependency resolution, testing, documentation generation, and incremental loads. It's free and you control everything.</p>
-    <p class="prose">dbt Cloud is the managed platform from dbt Labs built on top of Core. It adds a browser-based IDE, job scheduling and orchestration, CI/CD integration (run dbt on every PR), a hosted docs site, the semantic layer, and the metadata API (dbt Explorer). You pay for it per seat.</p>
-    <p class="prose" style="margin-bottom:0">The key distinction: with Core, you own the infrastructure. You pick the scheduler, set up CI, host your own docs. With Cloud, dbt Labs owns that layer. Same transformation logic, different operational model.</p>
+    <p class="prose">dbt Platform is the managed offering from dbt Labs built on top of Core. It adds a browser-based IDE, job scheduling and orchestration, CI/CD integration (run dbt on every PR), a hosted docs site, the semantic layer, and the metadata API (dbt Explorer). You pay for it per seat.</p>
+    <p class="prose" style="margin-bottom:0">The key distinction: with Core, you own the infrastructure. You pick the scheduler, set up CI, host your own docs. With the platform, dbt Labs owns that layer. Same transformation logic, different operational model.</p>
   </div>
 </div>
 
 <!-- SECTION 1 -->
 <div class="section">
   <p class="section-label">The question</p>
-  <p class="prose">I get this question a lot. Usually from teams already running Core, running it well, and trying to decide whether the cost of Cloud is justified. Or from new teams choosing before they've written a single model.</p>
-  <p class="prose">For a long time, the honest answer was: it depends on your team size and how much operational overhead you want to manage. Core does the transformation. Cloud handles the jobs, the CI, the docs hosting. Pick based on whether you want to run that infrastructure yourself.</p>
+  <p class="prose">I get this question a lot. Usually from teams already running Core, running it well, and trying to decide whether the cost of the platform is justified. Or from new teams choosing before they've written a single model.</p>
+  <p class="prose">For a long time, the honest answer was: it depends on your team size and how much operational overhead you want to manage. Core does the transformation. The platform handles the jobs, the CI, the docs hosting. Pick based on whether you want to run that infrastructure yourself.</p>
   <p class="prose">That framing still holds. But AI has introduced a second dimension that didn't exist three years ago, and it changes the calculation for some teams.</p>
 </div>
 
@@ -131,7 +152,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 2 -->
 <div class="section">
   <p class="section-label">Where Core is probably enough</p>
-  <p class="prose">Let's start with the honest case for Core. For a lot of teams, Core is genuinely the right choice, not as a stepping stone to Cloud, but as the permanent solution.</p>
+  <p class="prose">For small, stable teams, Core is a legitimate long-term choice. It's worth being honest about that before getting into where it breaks.</p>
 
   <div class="checklist">
     <div class="check-item">
@@ -140,7 +161,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </div>
     <div class="check-item">
       <span class="check-icon" style="color:#3fb950">✓</span>
-      <div class="check-text"><strong>You already have a scheduler you trust.</strong> Airflow, Prefect, Dagster, GitHub Actions. If you're already running one and it works, Core slots in cleanly. No reason to pay Cloud to replace something you already have.</div>
+      <div class="check-text"><strong>You already have a scheduler you trust.</strong> Airflow, Prefect, Dagster, GitHub Actions. If you're already running one and it works, Core slots in cleanly. No reason to pay to replace something that already works.</div>
     </div>
     <div class="check-item">
       <span class="check-icon" style="color:#3fb950">✓</span>
@@ -164,13 +185,13 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 3 -->
 <div class="section">
   <p class="section-label">What you're actually deciding</p>
-  <p class="prose">The decision between Core and Cloud isn't "does the transformation work?" It does, in both cases. The decision is where the operational complexity lives.</p>
+  <p class="prose">The decision between Core and the platform isn't "does the transformation work?" It does, in both cases. The decision is where the operational complexity lives.</p>
 
   <table class="cost-table" style="margin-top:24px">
     <tr>
       <th>layer</th>
       <th>dbt Core</th>
-      <th>dbt Cloud</th>
+      <th>dbt Platform</th>
     </tr>
     <tr>
       <td><span class="cost-badge" style="background:rgba(255,107,53,.1);color:#ff6b35;border:1px solid rgba(255,107,53,.2)">cost</span></td>
@@ -203,7 +224,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <td>Available (query metrics programmatically)</td>
     </tr>
   </table>
-  <p class="caption">Orange = where licensing cost lives. Blue = functional parity, different operational model. Yellow = Cloud-only surface.</p>
+  <p class="caption">Orange = where licensing cost lives. Blue = functional parity, different operational model. Yellow = Platform-only surface.</p>
 
   <div class="pull" style="margin-top:28px">
     Core is free in licensing cost. It's not free in operational cost. You're paying with engineer hours instead of seat fees. For small teams with infrastructure experience, that trade is worth it. For teams that would rather spend those hours on analytics, it's often not.
@@ -229,7 +250,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <h4>Core requires you to wire</h4>
       <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Job history + alerting:</strong> you set this up, own the paging</div></div>
       <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Access control:</strong> no environment-level permissions out of the box</div></div>
-      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Column-level lineage:</strong> not available without Cloud Explorer</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Column-level lineage:</strong> not available without dbt Explorer</div></div>
       <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Metadata API:</strong> no programmatic access to model metadata</div></div>
     </div>
   </div>
@@ -239,11 +260,81 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <div class="sep"></div>
 
+<!-- SECTION: BREAKING POINTS -->
+<div class="section">
+  <p class="section-label">What the breaking point looks like</p>
+  <p class="prose">These are the patterns I see most often when teams realize Core isn't the right fit anymore. They're not dramatic failures — they're friction that compounds.</p>
+
+  <div style="margin-top:24px">
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)">
+        <span class="sname">The team grew and informal coordination stopped working</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc">
+            <div class="ch">Core</div>
+            <p>The transformation still runs. But now there are nine analysts, four definitions of "revenue," and no canonical model anyone trusts. Core has no job history, no environment-level access controls, no way to audit who changed what and when. The data is fine. The coordination isn't.</p>
+          </div>
+          <div class="dc">
+            <div class="ch">dbt Platform</div>
+            <p>A single governed environment where job history is logged, model ownership is visible, and the canonical revenue definition lives in one place with a PR history behind it. When someone asks "which revenue?" the answer is a link, not a Slack thread.</p>
+          </div>
+        </div>
+        <div class="scenario-note">The data didn't get worse. The coordination overhead grew past what a transformation tool was designed to hold.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)">
+        <span class="sname">The scheduler went down and nobody knew what state the warehouse was in</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc">
+            <div class="ch">Core</div>
+            <p>When the scheduler fails, Core can't tell you which jobs ran, which failed, or what the warehouse looks like right now. The on-call engineer spends the first hour just reconstructing state. There's no run log, no alerting, no way to retry a specific failed step from anywhere but the command line.</p>
+          </div>
+          <div class="dc">
+            <div class="ch">dbt Platform</div>
+            <p>Full job run history, failure alerts with context, and a UI to inspect exactly where a run broke and restart from that point. The investigation takes minutes. And it's usually the data engineer, not an infra engineer, who resolves it.</p>
+          </div>
+        </div>
+        <div class="scenario-note">Every team running Core on a self-managed scheduler is one infrastructure incident away from this. It's not a question of if — it's a question of how often and how long it takes to recover.</div>
+      </div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-trigger" onclick="toggleScenario(this)">
+        <span class="sname">The AI layer couldn't tell a staging model from a mart</span>
+        <span class="chevron">▼</span>
+      </div>
+      <div class="scenario-body">
+        <div class="scenario-split">
+          <div class="dc">
+            <div class="ch">Core</div>
+            <p>The AI tool can see the warehouse tables but has no concept of what they mean. It can't distinguish <code>stg_orders</code> from <code>fct_orders</code>, doesn't know which revenue model is canonical, and has no access to descriptions or lineage. Queries it generates are wrong often enough that analysts stop trusting it.</p>
+          </div>
+          <div class="dc">
+            <div class="ch">dbt Platform</div>
+            <p>The Discovery API gives AI tools structured access to model metadata, descriptions, lineage, and semantic layer definitions. The AI understands that <code>fct_revenue</code> is the canonical model and what it includes — because that context is queryable, not locked in a static HTML page nobody opened.</p>
+          </div>
+        </div>
+        <div class="scenario-note"><strong>This is the gap that's hardest to work around.</strong> You can build your own alerting. You can export docs to Confluence. You can't easily give an AI agent a programmatic metadata API from scratch.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
 <!-- SECTION 5: AI ANGLE -->
 <div class="section">
   <p class="section-label">Where AI changes the math</p>
-  <p class="prose">Here's the part that's actually new. For years, Core vs Cloud was mostly about operational overhead. That's still true. But there's a second question now: <strong>what does your AI tooling need from your data infrastructure?</strong></p>
-  <p class="prose">AI assistants — whether it's Copilot generating SQL, an agent querying your warehouse, a custom analytics bot, or dbt Copilot inside Cloud — all share a dependency: they need structured, discoverable, machine-readable metadata to be useful.</p>
+  <p class="prose">Here's the part that's actually new. For years, Core vs the platform was mostly about operational overhead. That's still true. But there's a second question now: <strong>what does your AI tooling need from your data infrastructure?</strong></p>
+  <p class="prose">AI assistants — whether it's Copilot generating SQL, an agent querying your warehouse, a custom analytics bot, or dbt Copilot inside the platform — all share a dependency: they need structured, discoverable, machine-readable metadata to be useful.</p>
 
   <div class="ai-diagram">
     <p style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#444c56;margin-bottom:20px">what AI agents need from your data stack</p>
@@ -259,7 +350,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <span class="ai-arrow">→</span>
       <div class="ai-note">
         <strong>Core:</strong> static HTML docs you generated and maybe hosted somewhere, not queryable via API, not tied to run history<br>
-        <strong>Cloud:</strong> Discovery API: programmatic access to model metadata, lineage, descriptions, semantic layer definitions
+        <strong>dbt Platform:</strong> Discovery API: programmatic access to model metadata, lineage, descriptions, semantic layer definitions
       </div>
     </div>
 
@@ -270,8 +361,8 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
     </div>
   </div>
 
-  <p class="prose">The warehouse layer is identical. Both Core and Cloud produce the same tables. The gap is in the metadata layer: the system that answers "what does this table do, how is it defined, what does it relate to?"</p>
-  <p class="prose">With Core, that metadata lives in static files. An AI agent can read them if you've built a pipeline to surface them. But they're not queryable via API, not tied to run history, and don't include column-level lineage. With Cloud, the Discovery API gives AI systems a structured interface to that information.</p>
+  <p class="prose">The warehouse layer is identical. Both produce the same tables. The gap is in the metadata layer: the system that answers "what does this table do, how is it defined, what does it relate to?"</p>
+  <p class="prose">With Core, that metadata lives in static files. An AI agent can read them if you've built a pipeline to surface them. But they're not queryable via API, not tied to run history, and don't include column-level lineage. With the platform, the Discovery API gives AI systems a structured interface to that information.</p>
 
   <div class="pull">
     AI doesn't make dbt Core worse at transformations. It makes the metadata gap more consequential. An agent writing SQL against your warehouse is only as good as its understanding of what your models mean. Core doesn't surface that in a machine-readable way by default.<br>
@@ -284,7 +375,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 6: ANALOGY -->
 <div class="section">
   <p class="section-label">The right frame</p>
-  <p class="prose">Here's how I think about it. dbt Core is the game. Cloud is the league infrastructure.</p>
+  <p class="prose">Here's how I think about it. dbt Core is the game. The platform is the league infrastructure.</p>
   <p class="prose">You can play basketball without a league. You can run plays, develop skills, win games. Great basketball happens in pickup courts and driveways. But if you want referees, broadcast feeds, injury reports, game film, scouting data — the tools that let <em>other systems</em> integrate with what you're doing — you need the league infrastructure. Not to play the game. To be part of a larger ecosystem.</p>
   <p class="prose">Data transformation is the game. dbt Core handles it. The metadata API, the semantic layer, the managed governance surface — that's the infrastructure that lets other systems (BI tools, AI agents, governance platforms) integrate with your data stack. If you don't need that integration surface, Core is fine. If you do, the integration infrastructure is what you're actually paying for.</p>
 </div>
@@ -307,7 +398,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
       <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>Cost optimization is a real constraint right now</div>
     </div>
     <div class="decision-card">
-      <div class="d-head" style="color:#ff6b35">Cloud starts to make sense if</div>
+      <div class="d-head" style="color:#ff6b35">dbt Platform starts to make sense if</div>
       <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Team is growing; context isn't shared and governance starts to matter</div>
       <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>You're spending meaningful hours on scheduler/CI maintenance</div>
       <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Frequent deploys need slim CI runs to catch regressions</div>
@@ -325,14 +416,14 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 <!-- SECTION 8: CONCLUSION -->
 <div class="section">
   <p class="section-label">Where this lands</p>
-  <p class="conclusion">Core is enough for a lot of teams. That's not a consolation prize. It's just accurate.</p>
-  <p class="prose">The transformation logic is identical. The models you write in Core work the same way in Cloud. There is no dbt-Core-quality versus dbt-Cloud-quality. There's one transformation engine running in different operational contexts.</p>
-  <p class="prose">The question is what wraps it. If you're managing a stable, small-team setup with reliable infrastructure, Core's operational model is a reasonable choice. The savings are real. The control is real.</p>
-  <p class="prose">If you're scaling, or if AI is becoming part of your workflow, the calculus shifts. Not because Core becomes bad, but because the systems around the transformation start to matter as much as the transformation itself. Governance, discovery, metadata APIs, semantic layer access. That's what Cloud sells. And in an environment where AI agents increasingly sit between your stakeholders and your warehouse, those layers carry more weight than they used to.</p>
+  <p class="conclusion">Core is enough for some teams. The question is whether you're still in that group.</p>
+  <p class="prose">The transformation logic is identical regardless of which you use. There is no Core-quality versus Platform-quality. There's one transformation engine running in different operational contexts. What differs is everything around it.</p>
+  <p class="prose">If you're small, stable, and not yet dealing with AI workflows, Core is a legitimate choice. But most teams don't stay in that position forever. They grow past the size where informal coordination works. They add AI tooling that needs metadata they can't provide. They get paged on a Friday because their scheduler went down and they can't tell what state the warehouse is in.</p>
+  <p class="prose">That's what dbt Platform addresses. Not the transformation — the governance layer, the observability, the metadata surface AI depends on, the semantic layer BI tools increasingly expect. It's the infrastructure that makes the transformation useful to more than just the people who built it.</p>
 
   <div class="pull">
-    The honest answer to "is dbt Core enough?" is: it depends on whether your investment is in the transformation itself, or in the infrastructure that wraps it. Core handles the former perfectly. Cloud handles both.<br>
-    <em>Where you fall depends on your team size, your operational appetite, and how much AI is touching your data stack.</em>
+    Core does one thing well: transforms data. The platform does that plus everything that needs to work around it — scheduling, CI, lineage, metadata APIs, semantic definitions, and the governance layer that keeps a growing team from stepping on each other.<br>
+    <em>If you're hitting any of those walls with Core, that's the specific problem the platform solves.</em>
   </div>
 </div>
 
@@ -345,6 +436,11 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 </div>
 <script>
 function toggleExpand(t){
+  var b=t.nextElementSibling,open=b.classList.contains('show');
+  b.classList.toggle('show',!open);
+  t.classList.toggle('open',!open);
+}
+function toggleScenario(t){
   var b=t.nextElementSibling,open=b.classList.contains('show');
   b.classList.toggle('show',!open);
   t.classList.toggle('open',!open);
