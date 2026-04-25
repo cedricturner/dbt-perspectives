@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data teams don't have a quality problem. They have a trust problem. — dbt perspectives</title>
+<title>Is dbt Core enough in the age of AI? — dbt perspectives</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -31,27 +31,33 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 .caption{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;margin-top:10px;line-height:1.55}
 
-/* Revenue comparison table */
-.rev-table{width:100%;border-radius:9px;overflow:hidden;border:1px solid #2d333b;margin-bottom:12px}
-.rev-table th{background:#161b22;padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid #2d333b}
-.rev-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #161b22;vertical-align:top}
-.rev-table tr:last-child td{border-bottom:none}
-.rev-table tr:hover td{background:rgba(255,255,255,.02)}
-.team-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600}
-.num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600}
-.test-pass{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:99px;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.2)}
-.def-note{font-size:11px;color:#8b949e;margin-top:2px;line-height:1.5}
+/* Expand block */
+.expand-block{border:1px solid #2d333b;border-radius:9px;overflow:hidden;margin:28px 0}
+.expand-trigger{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;background:#161b22;user-select:none;transition:background .15s}
+.expand-trigger:hover{background:#1c2129}
+.expand-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:#8b949e}
+.expand-chevron{color:#444c56;font-size:11px;transition:transform .2s}
+.expand-trigger.open .expand-chevron{transform:rotate(180deg)}
+.expand-body{display:none;padding:20px 20px 22px;border-top:1px solid #2d333b;background:#0c1219}
+.expand-body.show{display:block}
+.expand-body .prose{font-size:14px}
 
-/* After dbt — single source */
-.single-source{background:#0c1a0c;border:1px solid rgba(63,185,80,.25);border-radius:9px;padding:20px 22px;margin-bottom:12px}
-.ss-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.ss-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:#3fb950;font-weight:600;letter-spacing:.5px}
-.ss-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.2)}
-.ss-model{background:#080f08;border-radius:6px;padding:12px 15px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;color:#e6edf3}
-.ss-refs{display:flex;flex-wrap:wrap;gap:8px}
-.ss-ref{font-family:'JetBrains Mono',monospace;font-size:10px;padding:4px 10px;background:rgba(88,166,255,.07);border:1px solid rgba(88,166,255,.2);border-radius:5px;color:#58a6ff}
+/* Cost table */
+.cost-table{width:100%;border-radius:9px;overflow:hidden;border:1px solid #2d333b;margin-bottom:12px}
+.cost-table th{background:#161b22;padding:10px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid #2d333b}
+.cost-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #161b22;vertical-align:top;color:#c9d1d9}
+.cost-table tr:last-child td{border-bottom:none}
+.cost-table tr:hover td{background:rgba(255,255,255,.02)}
+.cost-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;font-weight:600}
 
-/* Visibility vs tests comparison */
+/* Checklist */
+.checklist{margin:24px 0;display:flex;flex-direction:column;gap:8px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:#161b22;border:1px solid #2d333b;border-radius:7px}
+.check-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.check-text{font-size:13px;color:#c9d1d9;line-height:1.55}
+.check-text strong{color:#e6edf3}
+
+/* Compare */
 .compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
 .compare-block{background:#161b22;border:1px solid #2d333b;border-radius:9px;padding:16px}
 .compare-block h4{font-size:10px;font-weight:600;margin-bottom:14px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace}
@@ -60,36 +66,31 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 .compare-text{font-size:12px;color:#8b949e;line-height:1.55}
 .compare-text strong{color:#e6edf3}
 
-/* Scenario styling */
-.scenario{margin-bottom:10px;border-radius:9px;overflow:hidden;border:1px solid #2d333b}
-.scenario-trigger{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;background:#161b22;user-select:none}
-.scenario-trigger:hover{background:#1c2129}
-.scenario-trigger .sname{font-size:13px;font-weight:500}
-.chevron{color:#8b949e;font-size:11px;transition:transform .2s}
-.scenario-trigger.open .chevron{transform:rotate(180deg)}
-.scenario-body{display:none}
-.scenario-body.show{display:block}
-.scenario-split{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #2d333b}
-.dc{padding:13px 15px}
-.dc:first-child{border-right:1px solid #2d333b;background:rgba(248,81,73,.03)}
-.dc:last-child{background:rgba(63,185,80,.03)}
-.dc .ch{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace;margin-bottom:7px}
-.dc:first-child .ch{color:#f85149}
-.dc:last-child .ch{color:#3fb950}
-.dc p{font-size:12px;color:#8b949e;line-height:1.6}
-.dc code{font-family:'JetBrains Mono',monospace;font-size:10px;background:rgba(255,255,255,.07);padding:1px 4px;border-radius:3px;color:#e6edf3}
-.scenario-note{font-size:12px;color:#8b949e;padding:10px 15px;background:#0e1117;border-top:1px solid #2d333b;line-height:1.55}
-.scenario-note strong{color:#e6edf3}
+/* AI layer diagram */
+.ai-diagram{background:#0c1219;border:1px solid #2d333b;border-radius:9px;padding:24px;margin:24px 0}
+.ai-layer{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.ai-layer:last-child{margin-bottom:0}
+.ai-pill{font-family:'JetBrains Mono',monospace;font-size:10px;padding:7px 12px;border-radius:6px;min-width:148px;text-align:center;flex-shrink:0;line-height:1.3}
+.ai-arrow{color:#444c56;font-size:13px;flex-shrink:0;margin-top:6px}
+.ai-note{font-size:12px;color:#8b949e;line-height:1.6;padding-top:4px}
+.ai-note strong{color:#e6edf3}
+
+/* Decision framework */
+.decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:24px 0}
+.decision-card{background:#161b22;border:1px solid #2d333b;border-radius:9px;padding:18px}
+.decision-card .d-head{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;font-weight:600}
+.decision-card .d-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:12px;color:#8b949e;line-height:1.5}
+.decision-card .d-dot{flex-shrink:0;margin-top:5px;width:5px;height:5px;border-radius:50%;display:inline-block}
 
 .conclusion{font-size:16px;color:#e6edf3;line-height:1.78;max-width:600px;margin-bottom:16px}
 
-.post-footer{margin-top:60px;padding-top:24px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.post-footer{margin-top:60px;padding-top:24px;border-top:1px solid #21262d;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .footer-back{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;transition:color .15s}
 .footer-back:hover{color:#8b949e}
 .footer-gh a{font-family:'JetBrains Mono',monospace;font-size:11px;color:#444c56;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
 .footer-gh a:hover{color:#8b949e}
 
-@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.scenario-split{grid-template-columns:1fr}.dc:first-child{border-right:none;border-bottom:1px solid #2d333b}}
+@media(max-width:580px){.compare-wrap{grid-template-columns:1fr}.decision-grid{grid-template-columns:1fr}.ai-layer{flex-direction:column;gap:6px}.ai-arrow{display:none}}
 </style>
 </head>
 <body>
@@ -99,219 +100,239 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">Adoption &amp; Culture</div>
-  <h1>Data teams don't have<br>a quality problem.<br>They have a trust problem.</h1>
-  <p class="lede">Tests tell you when something broke. They don't tell you whether the pipeline is doing what you think. Those are different problems.</p>
+  <div class="hero-tag">Architecture</div>
+  <h1>Is dbt Core enough<br>in the age of AI?</h1>
+  <p class="lede">For most of dbt's history, this was a straightforward question. AI changed the calculus — not because of AI features in dbt Cloud, but because of what AI agents actually need from your data infrastructure.</p>
 </div>
 
-<!-- SECTION 1: INTUITION -->
+<!-- COLLAPSE: What is dbt Core vs dbt Cloud? -->
+<div class="expand-block" style="margin-bottom:52px">
+  <div class="expand-trigger" onclick="toggleExpand(this)">
+    <span class="expand-label">↓ What is dbt Core vs dbt Cloud? (expand if unfamiliar)</span>
+    <span class="expand-chevron">▼</span>
+  </div>
+  <div class="expand-body">
+    <p class="prose">dbt Core is the open-source transformation framework. You install it locally or in a container, write SQL models, and run them against your warehouse. It handles dependency resolution, testing, documentation generation, and incremental loads. It's free and you control everything.</p>
+    <p class="prose">dbt Cloud is the managed platform from dbt Labs built on top of Core. It adds a browser-based IDE, job scheduling and orchestration, CI/CD integration (run dbt on every PR), a hosted docs site, the semantic layer, and the metadata API (dbt Explorer). You pay for it per seat.</p>
+    <p class="prose" style="margin-bottom:0">The key distinction: with Core, you own the infrastructure — you pick the scheduler, set up CI, host your own docs. With Cloud, dbt Labs owns that layer. Same transformation logic, different operational model.</p>
+  </div>
+</div>
+
+<!-- SECTION 1 -->
 <div class="section">
-  <p class="section-label">What people think</p>
-  <p class="prose">The standard response to "I don't trust the data" is: add more tests. Write assertions. Check row counts. Test uniqueness. Expand coverage. It's a reasonable instinct.</p>
-  <p class="prose">It's aimed at the wrong problem.</p>
-  <p class="prose">Most data teams don't distrust their pipelines because they produce wrong data. They distrust them because they can't <em>tell</em> whether the data is right. That's not a quality problem. It's a visibility problem.</p>
+  <p class="section-label">The question</p>
+  <p class="prose">I get this question a lot. Usually from teams already running Core, running it well, and trying to decide whether the cost of Cloud is justified. Or from new teams choosing before they've written a single model.</p>
+  <p class="prose">For a long time, the honest answer was: it depends on your team size and how much operational overhead you want to manage. Core does the transformation. Cloud handles the jobs, the CI, the docs hosting. Pick based on whether you want to run that infrastructure yourself.</p>
+  <p class="prose">That framing still holds. But AI has introduced a second dimension that didn't exist three years ago, and it changes the calculation for some teams.</p>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 2: TENSION -->
+<!-- SECTION 2 -->
 <div class="section">
-  <p class="section-label">The tension</p>
-  <p class="prose">Here's the thing that keeps happening. Two teams present to the same executive. Q3 revenue. Different numbers. Both built their models carefully. Both are passing their tests.</p>
-  <p class="prose">The meeting turns into a definition negotiation. What counts as revenue — gross, net, recognized? Are refunds subtracted? How does it handle the month-end edge case? Nobody actually knows, because the pipelines are opaque. You'd have to read the code to find out — and nobody has time for that in the meeting.</p>
+  <p class="section-label">Where Core is probably enough</p>
+  <p class="prose">Let's start with the honest case for Core. For a lot of teams, Core is genuinely the right choice — not as a stepping stone to Cloud, but as the permanent solution.</p>
 
-  <div style="margin-top:28px;margin-bottom:8px">
-    <table class="rev-table">
-      <tr>
-        <th>team</th>
-        <th>Q3 revenue</th>
-        <th>tests</th>
-        <th>definition edge case</th>
-      </tr>
-      <tr>
-        <td><span class="team-pill" style="background:rgba(88,166,255,.1);color:#58a6ff;border:1px solid rgba(88,166,255,.2)">Finance</span></td>
-        <td><span class="num" style="color:#e6edf3">$2,143,000</span></td>
-        <td><span class="test-pass">✓ passing</span></td>
-        <td><div class="def-note">Excludes refunds. Includes pending.</div></td>
-      </tr>
-      <tr>
-        <td><span class="team-pill" style="background:rgba(210,153,34,.1);color:#d29922;border:1px solid rgba(210,153,34,.2)">Growth</span></td>
-        <td><span class="num" style="color:#e6edf3">$1,987,000</span></td>
-        <td><span class="test-pass">✓ passing</span></td>
-        <td><div class="def-note">Net of refunds. Excludes pending.</div></td>
-      </tr>
-      <tr>
-        <td><span class="team-pill" style="background:rgba(163,113,247,.1);color:#a371f7;border:1px solid rgba(163,113,247,.2)">Sales Ops</span></td>
-        <td><span class="num" style="color:#e6edf3">$2,301,000</span></td>
-        <td><span class="test-pass">✓ passing</span></td>
-        <td><div class="def-note">Includes tax. Booked date, not close date.</div></td>
-      </tr>
-      <tr>
-        <td><span class="team-pill" style="background:rgba(63,185,80,.1);color:#3fb950;border:1px solid rgba(63,185,80,.2)">Analytics</span></td>
-        <td><span class="num" style="color:#e6edf3">$2,074,000</span></td>
-        <td><span class="test-pass">✓ passing</span></td>
-        <td><div class="def-note">Close date. Net of refunds and discounts.</div></td>
-      </tr>
-      <tr>
-        <td><span class="team-pill" style="background:rgba(248,81,73,.1);color:#f85149;border:1px solid rgba(248,81,73,.2)">Data Eng</span></td>
-        <td><span class="num" style="color:#e6edf3">$2,218,000</span></td>
-        <td><span class="test-pass">✓ passing</span></td>
-        <td><div class="def-note">Recognition date. Includes deferred.</div></td>
-      </tr>
-    </table>
+  <div class="checklist">
+    <div class="check-item">
+      <span class="check-icon" style="color:#3fb950">✓</span>
+      <div class="check-text"><strong>Small team, shared context.</strong> When 1–3 people own the data stack and collaborate daily, the informal coordination that replaces formal governance works fine.</div>
+    </div>
+    <div class="check-item">
+      <span class="check-icon" style="color:#3fb950">✓</span>
+      <div class="check-text"><strong>You already have a scheduler you trust.</strong> Airflow, Prefect, Dagster, GitHub Actions — if you're already running one and it works, Core slots in cleanly. No reason to pay Cloud to replace something you already have.</div>
+    </div>
+    <div class="check-item">
+      <span class="check-icon" style="color:#3fb950">✓</span>
+      <div class="check-text"><strong>Your pipelines are stable.</strong> If you're not doing frequent deploys, the CI/CD story is less critical. A cron job that runs dbt is a legitimate setup.</div>
+    </div>
+    <div class="check-item">
+      <span class="check-icon" style="color:#3fb950">✓</span>
+      <div class="check-text"><strong>No AI workflows are touching your data yet.</strong> If your stack is analyst-written SQL and no agents are querying warehouse metadata, the metadata surface gap doesn't matter.</div>
+    </div>
+    <div class="check-item">
+      <span class="check-icon" style="color:#3fb950">✓</span>
+      <div class="check-text"><strong>Documentation lives elsewhere and people actually read it.</strong> If your team uses a wiki or well-maintained YAML descriptions — and that system works — Core isn't missing anything.</div>
+    </div>
   </div>
-  <p class="caption">Five teams. Five numbers. All passing tests. Nobody wrong — they just answered different questions.</p>
+
+  <p class="prose" style="margin-top:24px">None of these are edge cases. A lot of serious, high-performing data teams fit this profile. Core handles the actual transformation perfectly well. The gap is operational, not analytical.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 3 -->
+<div class="section">
+  <p class="section-label">What you're actually deciding</p>
+  <p class="prose">The decision between Core and Cloud isn't "does the transformation work?" It does, in both cases. The decision is where the operational complexity lives.</p>
+
+  <table class="cost-table" style="margin-top:24px">
+    <tr>
+      <th>layer</th>
+      <th>dbt Core</th>
+      <th>dbt Cloud</th>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(255,107,53,.1);color:#ff6b35;border:1px solid rgba(255,107,53,.2)">cost</span></td>
+      <td>Free to run</td>
+      <td>Per-seat pricing</td>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(88,166,255,.1);color:#58a6ff;border:1px solid rgba(88,166,255,.2)">scheduling</span></td>
+      <td>You bring a scheduler (Airflow, cron, etc.)</td>
+      <td>Built in, configurable in the UI</td>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(88,166,255,.1);color:#58a6ff;border:1px solid rgba(88,166,255,.2)">CI / CD</span></td>
+      <td>You wire it (GitHub Actions, etc.)</td>
+      <td>Slim CI runs on every PR, managed</td>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(88,166,255,.1);color:#58a6ff;border:1px solid rgba(88,166,255,.2)">docs</span></td>
+      <td>Generate to static HTML, host yourself</td>
+      <td>Hosted Explorer with lineage, column-level</td>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(210,153,34,.1);color:#d29922;border:1px solid rgba(210,153,34,.2)">metadata API</span></td>
+      <td>Not available</td>
+      <td>Available (Discovery API)</td>
+    </tr>
+    <tr>
+      <td><span class="cost-badge" style="background:rgba(210,153,34,.1);color:#d29922;border:1px solid rgba(210,153,34,.2)">semantic layer</span></td>
+      <td>Not available</td>
+      <td>Available (query metrics programmatically)</td>
+    </tr>
+  </table>
+  <p class="caption">Orange = where licensing cost lives. Blue = functional parity, different operational model. Yellow = Cloud-only surface.</p>
 
   <div class="pull" style="margin-top:28px">
-    Tests confirmed each model was internally consistent. They couldn't tell anyone which model was <strong>canonical</strong>. That's not a quality failure. That's a visibility failure.
+    Core is free in licensing cost. It's not free in operational cost. You're paying with engineer hours instead of seat fees. For small teams with infrastructure experience, that trade is worth it. For teams that would rather spend those hours on analytics, it's often not.
   </div>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 3: WHAT CHANGES -->
+<!-- SECTION 4 -->
 <div class="section">
-  <p class="section-label">What actually changes</p>
-  <p class="prose">Tests and visibility are different things. Tests verify correctness — when a constraint is violated, you find out. Visibility makes the pipeline legible — anyone can inspect what it does, trace intermediate steps, understand the definition without having to ask someone who built it.</p>
+  <p class="section-label">Where Core starts to strain</p>
+  <p class="prose">There are specific situations where Core starts to show seams — not because it's doing the transformation wrong, but because the surrounding system complexity outgrows what a pure transformation tool can hold.</p>
 
-  <div class="compare-wrap" style="margin-top:24px;margin-bottom:28px">
+  <div class="compare-wrap" style="margin-top:24px">
     <div class="compare-block">
-      <h4>what tests give you</h4>
-      <div class="compare-row"><span class="compare-icon">✓</span><div class="compare-text"><strong>Correctness signals</strong> — know when a constraint breaks</div></div>
-      <div class="compare-row"><span class="compare-icon">✓</span><div class="compare-text"><strong>Regression detection</strong> — know when an update breaks something</div></div>
-      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Can't tell you if the <em>logic</em> is right, only if it's internally consistent</div></div>
-      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Don't tell another team what the model actually does</div></div>
-      <div class="compare-row"><span class="compare-icon">✗</span><div class="compare-text">Don't prevent two teams from defining "revenue" differently</div></div>
+      <h4>Core manages well</h4>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Model runs</strong> — trigger, execute, test, document</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>SQL transformations</strong> — all materializations, incremental logic</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Static docs</strong> — generate and serve yourself</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Test coverage</strong> — schema tests, custom data tests</div></div>
     </div>
     <div class="compare-block">
-      <h4>what visibility gives you</h4>
-      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Inspectability</strong> — anyone can query intermediate steps</div></div>
-      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Reusability</strong> — others can build on your model instead of rebuilding it</div></div>
-      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Single definition</strong> — <code>ref('stg_orders')</code> everywhere means one answer</div></div>
-      <div class="compare-row"><span class="compare-icon" style="color:#3fb950">✓</span><div class="compare-text"><strong>Transfer of trust</strong> — "I trust it because I can see it" extends beyond the original author</div></div>
+      <h4>Core requires you to wire</h4>
+      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Job history + alerting</strong> — you set this up, own the paging</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Access control</strong> — no environment-level permissions out of the box</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Column-level lineage</strong> — not available without Cloud Explorer</div></div>
+      <div class="compare-row"><span class="compare-icon" style="color:#f85149">✗</span><div class="compare-text"><strong>Metadata API</strong> — no programmatic access to model metadata</div></div>
     </div>
   </div>
 
-  <p class="prose">The thing dbt does that tests don't: every intermediate step becomes a real, persistent, queryable table. When another team wants to understand your revenue model, they don't schedule a meeting. They run a SELECT.</p>
+  <p class="prose" style="margin-top:24px">Most of these are manageable. Teams build around them — they use PagerDuty for alerts, handle access at the warehouse level, export docs to Confluence. The question is whether that's the highest-value use of your time.</p>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 4: SINGLE SOURCE -->
+<!-- SECTION 5: AI ANGLE -->
 <div class="section">
-  <p class="section-label">What emerges</p>
-  <p class="prose">When the canonical definition lives in one dbt model — and every team references it with <code style="font-family:'JetBrains Mono',monospace;font-size:12px;background:rgba(255,255,255,.07);padding:1px 5px;border-radius:3px">ref()</code> — there's no more "which revenue?" meeting. There's one answer. It might still be wrong in someone's view, but at least the disagreement is about the definition — not about whose calculation to trust.</p>
+  <p class="section-label">Where AI changes the math</p>
+  <p class="prose">Here's the part that's actually new. For years, Core vs Cloud was mostly about operational overhead. That's still true. But there's a second question now: <strong>what does your AI tooling need from your data infrastructure?</strong></p>
+  <p class="prose">AI assistants — whether it's Copilot generating SQL, an agent querying your warehouse, a custom analytics bot, or dbt Copilot inside Cloud — all share a dependency: they need structured, discoverable, machine-readable metadata to be useful.</p>
 
-  <div style="margin-top:28px">
-    <div class="single-source">
-      <div class="ss-head">
-        <span class="ss-title">models/marts/fct_revenue.sql — one canonical model</span>
-        <span class="ss-badge">all teams reference this</span>
+  <div class="ai-diagram">
+    <p style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#444c56;margin-bottom:20px">what AI agents need from your data stack</p>
+
+    <div class="ai-layer">
+      <div class="ai-pill" style="background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.25);color:#58a6ff">AI agent / assistant</div>
+      <span class="ai-arrow">→</span>
+      <div class="ai-note"><strong>What it's asking:</strong> "What tables exist? What do they mean? How are they related? What's a 'conversion' in this company's data?"</div>
+    </div>
+
+    <div class="ai-layer" style="padding-left:20px">
+      <div class="ai-pill" style="background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.25);color:#d29922">metadata layer</div>
+      <span class="ai-arrow">→</span>
+      <div class="ai-note">
+        <strong>Core:</strong> static HTML docs you generated and maybe hosted somewhere — not queryable via API, not tied to run history<br>
+        <strong>Cloud:</strong> Discovery API — programmatic access to model metadata, lineage, descriptions, semantic layer definitions
       </div>
-      <div class="ss-model"><span style="color:#8b949e">-- The definition lives here. Change it once, every ref() gets the update.</span>
-<span style="color:#ff7b72">SELECT</span>
-    o.order_id,
-    o.close_date,
-    o.total_amount - <span style="color:#79c0ff">COALESCE</span>(r.refund_amount, <span style="color:#79c0ff">0</span>) <span style="color:#ff7b72">AS</span> net_revenue,
-    o.is_recognized
-<span style="color:#ff7b72">FROM</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_orders'</span>) }} o
-<span style="color:#ff7b72">LEFT JOIN</span> {{ <span style="color:#d2a8ff">ref</span>(<span style="color:#a5d6ff">'stg_refunds'</span>) }} r <span style="color:#ff7b72">ON</span> o.order_id = r.order_id
-<span style="color:#ff7b72">WHERE</span> o.status = <span style="color:#a5d6ff">'closed'</span>
-  <span style="color:#ff7b72">AND</span> o.is_recognized = <span style="color:#ff7b72">true</span></div>
-      <div style="margin-bottom:10px;font-size:12px;color:#8b949e">Every team that needs revenue references this model:</div>
-      <div class="ss-refs">
-        <span class="ss-ref">ref('fct_revenue') — Finance</span>
-        <span class="ss-ref">ref('fct_revenue') — Growth</span>
-        <span class="ss-ref">ref('fct_revenue') — Sales Ops</span>
-        <span class="ss-ref">ref('fct_revenue') — Analytics</span>
-        <span class="ss-ref">ref('fct_revenue') — Data Eng</span>
-      </div>
+    </div>
+
+    <div class="ai-layer" style="padding-left:40px">
+      <div class="ai-pill" style="background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.25);color:#3fb950">warehouse</div>
+      <span class="ai-arrow">→</span>
+      <div class="ai-note">The actual tables. Both Core and Cloud produce the same tables with the same logic. This layer is identical.</div>
     </div>
   </div>
-  <p class="caption">Five teams. One number. The definition debate becomes a PR comment — not a recurring meeting.</p>
 
-  <div class="pull" style="margin-top:28px">
-    The "five versions of revenue" problem isn't a definition problem. It's a visibility problem. When there's one canonical table everyone can query and inspect, the question shifts from "whose number?" to "is this definition right?" — which is a much more useful conversation.
-  </div>
-</div>
+  <p class="prose">The warehouse layer is identical. Both Core and Cloud produce the same tables. The gap is in the metadata layer — the system that answers "what does this table do, how is it defined, what does it relate to?"</p>
+  <p class="prose">With Core, that metadata lives in static files. An AI agent can read them if you've built a pipeline to surface them. But they're not queryable via API, not tied to run history, and don't include column-level lineage. With Cloud, the Discovery API gives AI systems a structured interface to that information.</p>
 
-<div class="sep"></div>
-
-<!-- SECTION 5: CONSEQUENCE -->
-<div class="section">
-  <p class="section-label">The consequence</p>
-  <p class="prose">The downstream effect of opaque pipelines isn't usually a data quality failure. It's a duplication failure. Teams stop trusting shared infrastructure and start maintaining their own copies.</p>
-  <p class="prose">Over time you end up with five "revenue" definitions, three "customer" definitions, and a permanent low-grade argument about whose numbers are right. Every new analyst who joins inherits this. Every new dashboard adds to it.</p>
-  <p class="prose">More tests don't fix it. Tests make each duplicate slightly more reliable. They don't stop the duplication. Visibility stops the duplication — when people can see inside a model, they build on it instead of rebuilding it.</p>
-</div>
-
-<div class="sep"></div>
-
-<!-- SECTION 6: WHEN IT BREAKS -->
-<div class="section">
-  <p class="section-label">When it breaks</p>
-  <p class="prose">Trust failures look different from quality failures. Here's what they actually look like.</p>
-
-  <div style="margin-top:24px">
-    <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A number looks off in a dashboard</span><span class="chevron">▼</span></div>
-      <div class="scenario-body">
-        <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The on-call analyst checks the dashboard and can't tell where the number comes from. They Slack the person who built it. Three hours later: "looks like a data quality issue." Nobody can see inside the model to confirm either way.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Query <code>fct_revenue</code>. Does the row count look right? Query <code>stg_orders</code> for the same date range. The discrepancy is right there. No expert needed. The model explains itself.</p></div>
-        </div>
-        <div class="scenario-note"><strong>The difference:</strong> in an opaque pipeline, debugging requires the person who built it. In a visible one, anyone who can write SQL can investigate.</div>
-      </div>
-    </div>
-
-    <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">New analyst joins and needs to understand the data</span><span class="chevron">▼</span></div>
-      <div class="scenario-body">
-        <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The onboarding doc says "use the revenue table." The analyst queries it and gets a number that doesn't match last week's exec review. They schedule a meeting with three people to figure out why. This happens four times in the first month.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The analyst reads <code>fct_revenue.sql</code>. They can see what's included, what's excluded. They trace upstream to <code>stg_orders</code> and see where the data comes from. Questions answered. No meeting needed.</p></div>
-        </div>
-        <div class="scenario-note">Every meeting to "align on definitions" is a visibility failure that should have been a SQL file.</div>
-      </div>
-    </div>
-
-    <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">Two teams have different numbers in the same exec review</span><span class="chevron">▼</span></div>
-      <div class="scenario-body">
-        <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The meeting stalls. Someone says "let's take this offline." An action item gets created to "align on the revenue definition." This same action item recurs quarterly. Nobody fixes it. The distrust compounds.</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>Both teams reference <code>ref('fct_revenue')</code>. Same number. If there's disagreement about whether it's right, the conversation is about the model definition — which has a PR, a history, a clear owner.</p></div>
-        </div>
-        <div class="scenario-note"><strong>The difference:</strong> a shared model makes disagreements concrete ("the model excludes refunds — should it?") instead of diffuse ("we have different numbers — why?").</div>
-      </div>
-    </div>
-
-    <div class="scenario">
-      <div class="scenario-trigger" onclick="toggleScenario(this)"><span class="sname">A staging model gets updated</span><span class="chevron">▼</span></div>
-      <div class="scenario-body">
-        <div class="scenario-split">
-          <div class="dc"><div class="ch">opaque pipeline</div><p>The analyst updates their script. Two weeks later, three dashboards start showing different numbers. Nobody knows what changed or which reports are affected. Someone schedules a post-mortem to "trace the lineage manually."</p></div>
-          <div class="dc"><div class="ch">dbt — visible pipeline</div><p>The lineage graph shows every downstream model that references <code>stg_orders</code>. Run <code>dbt run -s stg_orders+</code> and everything that depends on it re-executes. Impact is visible before the change ships, not after.</p></div>
-        </div>
-        <div class="scenario-note">Lineage isn't something you build separately. It emerges from the <code>ref()</code> calls that already had to be there.</div>
-      </div>
-    </div>
+  <div class="pull">
+    AI doesn't make dbt Core worse at transformations. It makes the metadata gap more consequential. An agent writing SQL against your warehouse is only as good as its understanding of what your models mean — and Core doesn't surface that in a machine-readable way by default.<br>
+    <em>The more AI touches your data stack, the more the layer around the transformation starts to matter.</em>
   </div>
 </div>
 
 <div class="sep"></div>
 
-<!-- SECTION 7: THE POINT -->
+<!-- SECTION 6: ANALOGY -->
 <div class="section">
-  <p class="section-label">The point</p>
-  <p class="conclusion">Data teams don't have a quality problem. They have a trust problem.</p>
-  <p class="conclusion">Trust isn't built by adding more tests to the same opaque pipeline. It's built when people can actually look inside — when intermediate steps are real tables they can query, when the definition lives in one file anyone can read, when a new analyst can understand the model without booking a meeting to ask the person who built it.</p>
-  <p class="prose">Tests are necessary. They're just not sufficient. A pipeline can pass every test and still be trusted by nobody — because trust requires legibility, and legibility requires visibility.</p>
-  <p class="prose" style="margin-top:16px">Here's the question worth asking about any data platform: can someone who never worked on this model understand what it does by reading it? If yes, trust can transfer. If no, it stays locked in the head of whoever built it.</p>
-  <div class="pull" style="margin-top:28px">
-    Most data teams don't rebuild because the platform is unreliable. They rebuild because they can't see inside it.<br>
-    "I trust it" usually means "I built it." That's not a quality problem — it's a visibility problem.<br>
-    <em>Persistent intermediate tables don't improve data quality. They transfer trust.</em>
+  <p class="section-label">The right frame</p>
+  <p class="prose">Here's how I think about it. dbt Core is the game. Cloud is the league infrastructure.</p>
+  <p class="prose">You can play basketball without a league. You can run plays, develop skills, win games. Great basketball happens in pickup courts and driveways. But if you want referees, broadcast feeds, injury reports, game film, scouting data — the tools that let <em>other systems</em> integrate with what you're doing — you need the league infrastructure. Not to play the game. To be part of a larger ecosystem.</p>
+  <p class="prose">Data transformation is the game. dbt Core handles it. The metadata API, the semantic layer, the managed governance surface — that's the infrastructure that lets other systems (BI tools, AI agents, governance platforms) integrate with your data stack. If you don't need that integration surface, Core is fine. If you do, the integration infrastructure is what you're actually paying for.</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 7: DECISION FRAMEWORK -->
+<div class="section">
+  <p class="section-label">How to think about the decision</p>
+  <p class="prose">There isn't a clean rule. But there are useful questions.</p>
+
+  <div class="decision-grid">
+    <div class="decision-card">
+      <div class="d-head" style="color:#3fb950">Core is probably right if</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>Small team (under 5 data people) with shared context</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>You already have a scheduler you trust and don't want to replace</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>Pipelines are stable — low deployment frequency</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>No AI agents querying your warehouse or metadata</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>You have eng bandwidth to maintain CI and docs infra</div>
+      <div class="d-item"><span class="d-dot" style="background:#3fb950"></span>Cost optimization is a real constraint right now</div>
+    </div>
+    <div class="decision-card">
+      <div class="d-head" style="color:#ff6b35">Cloud starts to make sense if</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Team is growing — context isn't shared, governance matters</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>You're spending meaningful hours on scheduler/CI maintenance</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Frequent deploys need slim CI runs to catch regressions</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>AI workflows are live or coming — agents need metadata access</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Stakeholders need a browsable docs experience, not a static site</div>
+      <div class="d-item"><span class="d-dot" style="background:#ff6b35"></span>Column-level lineage matters for compliance or debugging</div>
+    </div>
+  </div>
+
+  <p class="prose" style="margin-top:24px">The shift usually happens around two inflection points: team size crossing 5–8 people (where informal coordination starts failing), and the moment AI workflows go live (where metadata discoverability starts mattering).</p>
+</div>
+
+<div class="sep"></div>
+
+<!-- SECTION 8: CONCLUSION -->
+<div class="section">
+  <p class="section-label">Where this lands</p>
+  <p class="conclusion">Core is enough for a lot of teams. That's not a consolation prize — it's just accurate.</p>
+  <p class="prose">The transformation logic is identical. The models you write in Core work the same way in Cloud. There is no dbt-Core-quality versus dbt-Cloud-quality. There's one transformation engine running in different operational contexts.</p>
+  <p class="prose">The question is what wraps it. If you're managing a stable, small-team setup with reliable infrastructure, Core's operational model is a reasonable choice. The savings are real. The control is real.</p>
+  <p class="prose">If you're scaling, or if AI is becoming part of your workflow, the calculus shifts. Not because Core becomes bad — because the systems around the transformation start to matter as much as the transformation itself. Governance, discovery, metadata APIs, semantic layer access. That's what Cloud sells. And in an environment where AI agents increasingly sit between your stakeholders and your warehouse, those layers carry more weight than they used to.</p>
+
+  <div class="pull">
+    The honest answer to "is dbt Core enough?" is: it depends on whether your investment is in the transformation itself, or in the infrastructure that wraps it. Core handles the former perfectly. Cloud handles both.<br>
+    <em>Where you fall depends on your team size, your operational appetite, and how much AI is touching your data stack.</em>
   </div>
 </div>
 
@@ -323,7 +344,7 @@ body{font-family:'DM Sans',sans-serif;background:#0e1117;color:#e6edf3;min-heigh
 
 </div>
 <script>
-function toggleScenario(t){
+function toggleExpand(t){
   var b=t.nextElementSibling,open=b.classList.contains('show');
   b.classList.toggle('show',!open);
   t.classList.toggle('open',!open);
