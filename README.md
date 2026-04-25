@@ -1,8 +1,8 @@
 # dbt perspectives
 
-I'm a field engineer at dbt Labs. Most of my time is spent with customers — in architecture reviews, implementation calls, and the conversations that happen when a team's data stack isn't working the way they expected.
+I'm a field engineer at dbt Labs. Most of my time is spent with customers: architecture reviews, implementation calls, and the conversations that happen when a team's data stack isn't working the way they expected.
 
-This is where I write about what I'm actually seeing. Not official positions. Just patterns from the field and how I'm making sense of them.
+This is where I write about what I'm actually seeing.
 
 **Live site → [cedricturner.github.io/dbt-perspectives](https://cedricturner.github.io/dbt-perspectives/)**
 
