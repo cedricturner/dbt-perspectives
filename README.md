@@ -13,7 +13,7 @@ This is where I write about what I'm actually seeing.
 | Post | Link |
 |------|------|
 | **The stored procedure is not your enemy** | [↗ open](https://cedricturner.github.io/dbt-perspectives/posts/the-script-is-not-your-enemy/) |
-| **Is dbt Core enough in the age of AI?** | [↗ open](https://cedricturner.github.io/dbt-perspectives/posts/is-dbt-core-enough/) |
+| **Is dbt Core enough?** | [↗ open](https://cedricturner.github.io/dbt-perspectives/posts/is-dbt-core-enough/) |
 
 ---
 
@@ -22,5 +22,5 @@ This is where I write about what I'm actually seeing.
 **[The stored procedure is not your enemy](https://cedricturner.github.io/dbt-perspectives/posts/the-script-is-not-your-enemy/)**
 The real problem isn't the technology. It's that your pipeline was designed to execute — not to be inspected. Stored procedure → dbt is an execution model change, not a code quality cleanup.
 
-**[Is dbt Core enough in the age of AI?](https://cedricturner.github.io/dbt-perspectives/posts/is-dbt-core-enough/)**
+**[Is dbt Core enough?](https://cedricturner.github.io/dbt-perspectives/posts/is-dbt-core-enough/)**
 For small, stable teams, Core is a legitimate long-term choice. But AI changed the calculus — not because of AI features in dbt Platform, but because of what AI agents actually need from your data infrastructure. That's where the gap shows up in practice.
